@@ -1,0 +1,16 @@
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/bin/Debug/net8.0/WaySpot.Infrastructure.deps.json
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/bin/Debug/net8.0/WaySpot.Infrastructure.dll
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/bin/Debug/net8.0/WaySpot.Infrastructure.pdb
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/bin/Debug/net8.0/WaySpot.Core.dll
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/bin/Debug/net8.0/WaySpot.Core.pdb
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.csproj.AssemblyReference.cache
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.AssemblyInfoInputs.cache
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.AssemblyInfo.cs
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.csproj.CoreCompileInputs.cache
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.sourcelink.json
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot..B84114A5.Up2Date
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.dll
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/refint/WaySpot.Infrastructure.dll
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/WaySpot.Infrastructure.pdb
+/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/Debug/net8.0/ref/WaySpot.Infrastructure.dll

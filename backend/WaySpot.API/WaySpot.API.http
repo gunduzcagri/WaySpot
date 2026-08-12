@@ -1,0 +1,6 @@
+@WaySpot.API_HostAddress = http://localhost:5075
+
+GET {{WaySpot.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

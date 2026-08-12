@@ -1,0 +1,428 @@
+--- backend/WaySpot.Core/Entities/AppUser.cs ---
+--- expected
++++ actual
+@@ -11,7 +11,6 @@
+     public UserRole Role { get; set; } = UserRole.User;
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+ 
+-    // Navigation
+     public Business? Business { get; set; }
+     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+     public ICollection<SavedRoute> SavedRoutes { get; set; } = new List<SavedRoute>();
+
+
+--- backend/WaySpot.Core/Entities/Business.cs ---
+--- expected
++++ actual
+@@ -8,11 +8,10 @@
+     public Guid UserId { get; set; }
+     public string Name { get; set; } = string.Empty;
+     public string Description { get; set; } = string.Empty;
+-    public Point Location { get; set; } = null!; // PostGIS Point, 4326
++    public Point Location { get; set; } = null!;
+     public bool IsActive { get; set; } = true;
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+ 
+-    // Navigation
+     public AppUser User { get; set; } = null!;
+     public ICollection<Post> Posts { get; set; } = new List<Post>();
+     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+
+--- backend/WaySpot.Core/Entities/Post.cs ---
+--- expected
++++ actual
+@@ -10,6 +10,5 @@
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+     public DateTime? ExpiresAt { get; set; }
+ 
+-    // Navigation
+     public Business Business { get; set; } = null!;
+ }
+
+--- backend/WaySpot.Core/Entities/Review.cs ---
+--- expected
++++ actual
+@@ -5,12 +5,11 @@
+     public Guid Id { get; set; }
+     public Guid BusinessId { get; set; }
+     public Guid UserId { get; set; }
+-    public int Rating { get; set; } // 1-5
++    public int Rating { get; set; }
+     public string Comment { get; set; } = string.Empty;
+-    public string PhotoUrl { get; set; } = string.Empty; // ZORUNLU
++    public string PhotoUrl { get; set; } = string.Empty;
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+ 
+-    // Navigation
+     public Business Business { get; set; } = null!;
+     public AppUser User { get; set; } = null!;
+ }
+
+--- backend/WaySpot.Core/Entities/SavedRoute.cs ---
+--- expected
++++ actual
+@@ -13,6 +13,5 @@
+     public double TotalDistanceKm { get; set; }
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+ 
+-    // Navigation
+     public AppUser User { get; set; } = null!;
+ }
+
+--- backend/WaySpot.API/Program.cs ---
+--- expected
++++ actual
+@@ -1,5 +1,11 @@
++using System.Text;
++using Microsoft.AspNetCore.Authentication.JwtBearer;
+ using Microsoft.EntityFrameworkCore;
++using Microsoft.IdentityModel.Tokens;
++using WaySpot.API.Middleware;
++using WaySpot.Core.Interfaces;
+ using WaySpot.Infrastructure.Data;
++using WaySpot.Infrastructure.Services;
+ 
+ var builder = WebApplication.CreateBuilder(args);
+ 
+@@ -8,6 +14,27 @@
+         builder.Configuration.GetConnectionString("DefaultConnection"),
+         npgsqlOptions => npgsqlOptions.UseNetTopologySuite()
+     ));
++
++builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
++    .AddJwtBearer(options =>
++    {
++        options.TokenValidationParameters = new TokenValidationParameters
++        {
++            ValidateIssuer = true,
++            ValidateAudience = true,
++            ValidateLifetime = true,
++            ValidateIssuerSigningKey = true,
++            ValidIssuer = builder.Configuration["Jwt:Issuer"],
++            ValidAudience = builder.Configuration["Jwt:Audience"],
++            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
++        };
++    });
++
++builder.Services.AddAuthorization();
++
++builder.Services.AddScoped<IJwtService, JwtService>();
++builder.Services.AddScoped<IPasswordService, PasswordService>();
++builder.Services.AddScoped<IGeoJsonLdService, GeoJsonLdService>();
+ 
+ builder.Services.AddControllers();
+ builder.Services.AddEndpointsApiExplorer();
+@@ -22,7 +49,9 @@
+ }
+ 
+ app.UseHttpsRedirection();
++app.UseAuthentication();
+ app.UseAuthorization();
++app.UseMiddleware<GlobalExceptionHandler>();
+ app.MapControllers();
+ 
+ app.Run();
+
+--- backend/WaySpot.API/Program.cs ---
+--- expected
++++ actual
+@@ -2,6 +2,7 @@
+ using Microsoft.AspNetCore.Authentication.JwtBearer;
+ using Microsoft.EntityFrameworkCore;
+ using Microsoft.IdentityModel.Tokens;
++using WaySpot.API.Middleware;
+ using WaySpot.Core.Interfaces;
+ using WaySpot.Infrastructure.Data;
+ using WaySpot.Infrastructure.Services;
+@@ -33,6 +34,7 @@
+ 
+ builder.Services.AddScoped<IJwtService, JwtService>();
+ builder.Services.AddScoped<IPasswordService, PasswordService>();
++builder.Services.AddScoped<IGeoJsonLdService, GeoJsonLdService>();
+ 
+ builder.Services.AddControllers();
+ builder.Services.AddEndpointsApiExplorer();
+@@ -49,6 +51,7 @@
+ app.UseHttpsRedirection();
+ app.UseAuthentication();
+ app.UseAuthorization();
++app.UseMiddleware<GlobalExceptionHandler>();
+ app.MapControllers();
+ 
+ app.Run();
+
+--- backend/WaySpot.API/Controllers/DiscoverController.cs ---
+--- expected
++++ actual
+@@ -36,13 +36,16 @@
+                 .Include(p => p.Business)
+                 .Where(p => p.Business.IsActive &&
+                     EF.Functions.IsWithinDistance(
+-                        p.Business.Location, 
+-                        userLocation, 
+-                        radiusMeters))
++                        p.Business.Location,
++                        userLocation,
++                        radiusMeters,
++                        true))
+                 .OrderByDescending(p => p.CreatedAt)
+                 .ToListAsync();
+ 
+-            if (posts.Count >= 30 || i == radii.Length - 1)
++            var postCount = posts.Count;
++
++            if (postCount >= 30 || i == radii.Length - 1)
+             {
+                 results = posts.Select(p => new PostResponse
+                 {
+
+
+--- backend/WaySpot.API/Controllers/ReviewsController.cs ---
+--- expected
++++ actual
+@@ -26,7 +26,6 @@
+     [Authorize(Roles = "User")]
+     public async Task<IActionResult> AddReview(Guid businessId, CreateReviewRequest request)
+     {
+-        // ZORUNLU VALIDASYON: PhotoUrl
+         if (string.IsNullOrWhiteSpace(request.PhotoUrl))
+             return BadRequest(new { message = "Fotograf URL'si zorunludur. Yorum yapabilmek icin fotograf yuklemelisiniz." });
+ 
+
+
+--- backend/WaySpot.API/Middleware/GlobalExceptionHandler.cs ---
+--- expected
++++ actual
+@@ -22,7 +22,7 @@
+         }
+         catch (Exception ex)
+         {
+-            _logger.LogError(ex, "Istek islenirken hata olustu. Path: {Path}, Method: {Method}", 
++            _logger.LogError(ex, "Istek islenirken hata olustu. Path: {Path}, Method: {Method}",
+                 context.Request.Path, context.Request.Method);
+             await HandleExceptionAsync(context, ex);
+         }
+
+
+--- backend/WaySpot.API/Program.cs ---
+--- expected
++++ actual
+@@ -1 +1,57 @@
+-app.UseMiddleware<GlobalExceptionHandler>();+using System.Text;
++using Microsoft.AspNetCore.Authentication.JwtBearer;
++using Microsoft.EntityFrameworkCore;
++using Microsoft.IdentityModel.Tokens;
++using WaySpot.API.Middleware;
++using WaySpot.Core.Interfaces;
++using WaySpot.Infrastructure.Data;
++using WaySpot.Infrastructure.Services;
++
++var builder = WebApplication.CreateBuilder(args);
++
++builder.Services.AddDbContext<WaySpotDbContext>(options =>
++    options.UseNpgsql(
++        builder.Configuration.GetConnectionString("DefaultConnection"),
++        npgsqlOptions => npgsqlOptions.UseNetTopologySuite()
++    ));
++
++builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
++    .AddJwtBearer(options =>
++    {
++        options.TokenValidationParameters = new TokenValidationParameters
++        {
++            ValidateIssuer = true,
++            ValidateAudience = true,
++            ValidateLifetime = true,
++            ValidateIssuerSigningKey = true,
++            ValidIssuer = builder.Configuration["Jwt:Issuer"],
++            ValidAudience = builder.Configuration["Jwt:Audience"],
++            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
++        };
++    });
++
++builder.Services.AddAuthorization();
++
++builder.Services.AddScoped<IJwtService, JwtService>();
++builder.Services.AddScoped<IPasswordService, PasswordService>();
++builder.Services.AddScoped<IGeoJsonLdService, GeoJsonLdService>();
++
++builder.Services.AddControllers();
++builder.Services.AddEndpointsApiExplorer();
++builder.Services.AddSwaggerGen();
++
++var app = builder.Build();
++
++if (app.Environment.IsDevelopment())
++{
++    app.UseSwagger();
++    app.UseSwaggerUI();
++}
++
++app.UseHttpsRedirection();
++app.UseAuthentication();
++app.UseAuthorization();
++app.UseMiddleware<GlobalExceptionHandler>();
++app.MapControllers();
++
++app.Run();
+
+--- cloudflare/worker.js ---
+--- expected
++++ actual
+@@ -19,8 +19,8 @@
+       });
+     }
+ 
+-    const cacheable = request.method === "GET" && 
+-      (url.pathname.startsWith("/api/discover") || 
++    const cacheable = request.method === "GET" &&
++      (url.pathname.startsWith("/api/discover") ||
+        url.pathname.startsWith("/api/businesses/"));
+ 
+     const cacheKey = new Request(url.toString(), request);
+
+
+--- frontend/src/components/MapView.jsx ---
+--- expected
++++ actual
+@@ -37,8 +37,15 @@
+   ) : null;
+ }
+ 
+-export default function MapView() {
++export default function MapView({ children, onCenterChange }) {
+   const [position, setPosition] = useState(null);
++
++  const handleMove = () => {
++    if (onCenterChange && window.mapInstance) {
++      const center = window.mapInstance.getCenter();
++      onCenterChange({ lat: center.lat, lng: center.lng });
++    }
++  };
+ 
+   return (
+     <MapContainer
+@@ -46,12 +53,18 @@
+       zoom={13}
+       scrollWheelZoom={true}
+       style={{ height: '100vh', width: '100%' }}
++      whenReady={(e) => {
++        window.mapInstance = e.target;
++        handleMove();
++      }}
++      moveend={handleMove}
+     >
+       <TileLayer
+         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+       />
+       <LocationMarker position={position} setPosition={setPosition} />
++      {children}
+     </MapContainer>
+   );
+ }
+
+--- frontend/src/App.jsx ---
+--- expected
++++ actual
+@@ -1,7 +1,17 @@
++import { useState } from 'react';
+ import MapView from './components/MapView';
++import RoutePlanner from './components/RoutePlanner';
++import DiscoverMarkers from './components/DiscoverMarkers';
+ 
+ function App() {
+-  return <MapView />;
++  const [mapCenter, setMapCenter] = useState({ lat: 39.9334, lng: 32.8597 });
++
++  return (
++    <MapView onCenterChange={setMapCenter}>
++      <RoutePlanner />
++      <DiscoverMarkers center={mapCenter} />
++    </MapView>
++  );
+ }
+ 
+ export default App;
+
+--- frontend/src/App.jsx ---
+--- expected
++++ actual
+@@ -1,10 +1,15 @@
++import { useState } from 'react';
+ import MapView from './components/MapView';
+ import RoutePlanner from './components/RoutePlanner';
++import DiscoverMarkers from './components/DiscoverMarkers';
+ 
+ function App() {
++  const [mapCenter, setMapCenter] = useState({ lat: 39.9334, lng: 32.8597 });
++
+   return (
+-    <MapView>
++    <MapView onCenterChange={setMapCenter}>
+       <RoutePlanner />
++      <DiscoverMarkers center={mapCenter} />
+     </MapView>
+   );
+ }
+
+
+--- frontend/src/components/DiscoverMarkers.jsx ---
+--- expected
++++ actual
+@@ -35,8 +35,8 @@
+   return (
+     <>
+       {posts.map(post => (
+-        <Marker 
+-          key={post.id} 
++        <Marker
++          key={post.id}
+           position={[post.business.latitude, post.business.longitude]}
+           icon={postIcon}
+         >
+
+
+--- backend/WaySpot.API/Controllers/McpController.cs ---
+--- expected
++++ actual
+@@ -1,6 +1,7 @@
+ using Microsoft.AspNetCore.Mvc;
+ using Microsoft.EntityFrameworkCore;
+ using NetTopologySuite.Geometries;
++using System.Linq;
+ using WaySpot.Core.DTOs;
+ using WaySpot.Infrastructure.Data;
+ 
+@@ -24,7 +25,6 @@
+         if (request.Points.Count < 2)
+             return BadRequest(new { message = "En az 2 nokta gerekli." });
+ 
+-        // Guzergahi LineString olarak olustur
+         var coordinates = request.Points
+             .Select(p => new Coordinate(p.Longitude, p.Latitude))
+             .ToArray();
+@@ -32,10 +32,9 @@
+         var routeLine = new LineString(coordinates) { SRID = 4326 };
+         var bufferMeters = request.BufferKm * 1000;
+ 
+-        // Guzergaha yakin isletmeleri bul (ST_DWithin)
+         var businesses = await _context.Businesses
+             .Where(b => b.IsActive &&
+-                EF.Functions.IsWithinDistance(b.Location, routeLine, bufferMeters))
++                EF.Functions.IsWithinDistance(b.Location, routeLine, bufferMeters, true))
+             .Include(b => b.Posts)
+             .ToListAsync();
+ 
+@@ -72,7 +71,7 @@
+         return Ok(new RouteSearchResponse
+         {
+             Businesses = result,
+-            TotalCount = result.Count,
++            TotalCount = result.Count(),
+             SearchBufferKm = request.BufferKm
+         });
+     }
+
+

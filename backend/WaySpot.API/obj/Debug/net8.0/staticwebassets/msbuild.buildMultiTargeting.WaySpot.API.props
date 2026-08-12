@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/WaySpot.API.props" />
+</Project>
