@@ -1,0 +1,99 @@
+:root {
+  /* === AYDINLIK MOD (Varsayılan) === */
+  --bg-page: #E8F4F4;
+  --bg-card: #FFFFFF;
+  --bg-input: #E8F4F4;
+  --bg-modal: #FFFFFF;
+  --bg-overlay: rgba(30, 58, 76, 0.5);
+
+  --primary: #2A6B6B;
+  --primary-hover: #236060;
+  --primary-light: rgba(42, 107, 107, 0.1);
+  --primary-text: #FFFFFF;
+
+  --secondary: #4A9B9B;
+  --secondary-hover: #3D8585;
+  --secondary-light: rgba(74, 155, 155, 0.1);
+  --secondary-text: #FFFFFF;
+
+  --accent: #E07A5F;
+  --accent-hover: #D46A4F;
+  --accent-light: rgba(224, 122, 95, 0.1);
+  --accent-text: #FFFFFF;
+
+  --light-teal: #87C4C4;
+  --light-teal-soft: rgba(135, 196, 196, 0.15);
+
+  --surface: #E8F4F4;
+  --surface-dark: #D4E8E8;
+
+  --navy: #1E3A4C;
+  --navy-light: #2A5068;
+
+  --text-primary: #1E3A4C;
+  --text-secondary: #6B8A8A;
+  --text-muted: #9BB5B5;
+  --text-inverse: #FFFFFF;
+
+  --danger: #C44536;
+  --danger-light: rgba(196, 69, 54, 0.1);
+  --success: #3D8B7A;
+  --success-light: rgba(61, 139, 122, 0.1);
+
+  --border: #D4E8E8;
+  --border-focus: #2A6B6B;
+
+  --shadow-soft: 0 4px 20px rgba(30, 58, 76, 0.08);
+  --shadow-medium: 0 8px 30px rgba(30, 58, 76, 0.12);
+  --shadow-strong: 0 12px 40px rgba(30, 58, 76, 0.16);
+}
+
+/* === KARANLIK MOD === */
+[data-theme="dark"] {
+  --bg-page: #0B1922;
+  --bg-card: #132B3A;
+  --bg-input: #132B3A;
+  --bg-modal: #1E3A4C;
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --primary: #87C4C4;
+  --primary-hover: #6BB0B0;
+  --primary-light: rgba(135, 196, 196, 0.15);
+  --primary-text: #0B1922;
+
+  --secondary: #4A9B9B;
+  --secondary-hover: #5AADAD;
+  --secondary-light: rgba(74, 155, 155, 0.15);
+  --secondary-text: #FFFFFF;
+
+  --accent: #E07A5F;
+  --accent-hover: #F08A6F;
+  --accent-light: rgba(224, 122, 95, 0.15);
+  --accent-text: #0B1922;
+
+  --light-teal: #4A9B9B;
+  --light-teal-soft: rgba(74, 155, 155, 0.2);
+
+  --surface: #132B3A;
+  --surface-dark: #1E3A4C;
+
+  --navy: #E8F4F4;
+  --navy-light: #9BC4C4;
+
+  --text-primary: #E8F4F4;
+  --text-secondary: #9BC4C4;
+  --text-muted: #6B9B9B;
+  --text-inverse: #0B1922;
+
+  --danger: #D65A4A;
+  --danger-light: rgba(214, 90, 74, 0.15);
+  --success: #4AA88A;
+  --success-light: rgba(74, 168, 138, 0.15);
+
+  --border: #1E3A4C;
+  --border-focus: #87C4C4;
+
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.5);
+}

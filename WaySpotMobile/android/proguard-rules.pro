@@ -1,0 +1,5 @@
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.facebook.react.bridge.** { *; }
+-dontwarn com.facebook.react.**
+-keep class com.wayspotmobile.** { *; }

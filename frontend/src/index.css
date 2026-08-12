@@ -1,9 +1,12 @@
+@import './styles/theme.css';
 @import 'leaflet/dist/leaflet.css';
 
 body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
 }
 
 #root {

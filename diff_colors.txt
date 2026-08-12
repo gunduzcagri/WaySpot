@@ -1,0 +1,7 @@
+--- Checking wayspot_3_palet_aydinlik_karanlik_prompt.md (3 files) ---
+
+MISSING: frontend/src/styles/theme.css
+
+MISSING: frontend/tailwind.config.js
+
+Check finished.
