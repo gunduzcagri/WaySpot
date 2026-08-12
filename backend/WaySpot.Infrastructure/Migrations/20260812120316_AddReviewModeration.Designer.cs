@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using WaySpot.Infrastructure.Data;
 namespace WaySpot.Infrastructure.Migrations
 {
     [DbContext(typeof(WaySpotDbContext))]
-    partial class WaySpotDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260812120316_AddReviewModeration")]
+    partial class AddReviewModeration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -8,6 +8,8 @@ public class Review
     public int Rating { get; set; }
     public string Comment { get; set; } = string.Empty;
     public string PhotoUrl { get; set; } = string.Empty;
+    public bool IsApproved { get; set; } = false; // Admin onayi gerekli
+    public bool IsFlagged { get; set; } = false; // Sikayet edildi
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Business Business { get; set; } = null!;

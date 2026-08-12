@@ -1,0 +1,223 @@
+--- Checking WaySpot_rehber_admin_panel.md (8 files) ---
+
+MISMATCH: backend/WaySpot.Core/Entities/Review.cs
+--- expected
++++ actual
+@@ -8,8 +8,8 @@
+     public int Rating { get; set; }
+     public string Comment { get; set; } = string.Empty;
+     public string PhotoUrl { get; set; } = string.Empty;
+-    public bool IsApproved { get; set; } = false; // Admin onayi gerekli
+-    public bool IsFlagged { get; set; } = false; // Sikayet edildi
++    public bool IsApproved { get; set; } = false;
++    public bool IsFlagged { get; set; } = false;
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+ 
+     public Business Business { get; set; } = null!;
+
+MISMATCH: backend/WaySpot.API/Controllers/AdminController.cs
+--- expected
++++ actual
+@@ -19,7 +19,6 @@
+         _context = context;
+     }
+ 
+-    // DASHBOARD ISTATISTIKLERI
+     [HttpGet("dashboard")]
+     public async Task<IActionResult> GetDashboardStats()
+     {
+@@ -54,7 +53,6 @@
+         });
+     }
+ 
+-    // KULLANICI YONETIMI
+     [HttpGet("users")]
+     public async Task<IActionResult> GetAllUsers()
+     {
+@@ -85,7 +83,6 @@
+         return NoContent();
+     }
+ 
+-    // ISLETME YONETIMI
+     [HttpGet("businesses")]
+     public async Task<IActionResult> GetAllBusinesses()
+     {
+@@ -123,7 +120,6 @@
+         return Ok(new { message = $"Isletme durumu {(isActive ? "aktif" : "pasif")} yapildi." });
+     }
+ 
+-    // YORUM MODERASYONU
+     [HttpGet("reviews/pending")]
+     public async Task<IActionResult> GetPendingReviews()
+     {
+
+MISMATCH: backend/WaySpot.API/Controllers/ReviewsController.cs
+--- expected
++++ actual
+@@ -1,12 +1,86 @@
+-[HttpGet]
+-[AllowAnonymous]
+-public async Task<IActionResult> GetReviews(Guid businessId)
++using System.Security.Claims;
++using Microsoft.AspNetCore.Authorization;
++using Microsoft.AspNetCore.Mvc;
++using Microsoft.EntityFrameworkCore;
++using WaySpot.Core.DTOs;
++using WaySpot.Core.Entities;
++using WaySpot.Infrastructure.Data;
++
++namespace WaySpot.API.Controllers;
++
++[ApiController]
++[Route("api/businesses/{businessId:guid}/[controller]")]
++[Authorize]
++public class ReviewsController : ControllerBase
+ {
+-    var reviews = await _context.Reviews
+-        .Where(r => r.BusinessId == businessId && r.IsApproved) // Sadece onayli yorumlar
+-        .Include(r => r.User)
+-        .OrderByDescending(r => r.CreatedAt)
+-        .ToListAsync();
++    private readonly WaySpotDbContext _context;
+ 
+-    return Ok(reviews.Select(r => MapToResponse(r).Result));
++    public ReviewsController(WaySpotDbContext context)
++    {
++        _context = context;
++    }
++
++    private Guid GetCurrentUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
++
++    [HttpPost]
++    [Authorize(Roles = "User")]
++    public async Task<IActionResult> AddReview(Guid businessId, CreateReviewRequest request)
++    {
++        // ZORUNLU VALIDASYON: PhotoUrl
++        if (string.IsNullOrWhiteSpace(request.PhotoUrl))
++            return BadRequest(new { message = "Fotograf URL'si zorunludur. Yorum yapabilmek icin fotograf yuklemelisiniz." });
++
++        if (request.BusinessId != businessId)
++            return BadRequest(new { message = "BusinessId uyusmazligi." });
++
++        var business = await _context.Businesses.FindAsync(businessId);
++        if (business == null) return NotFound(new { message = "Isletme bulunamadi." });
++
++        var userId = GetCurrentUserId();
++
++        if (await _context.Reviews.AnyAsync(r => r.BusinessId == businessId && r.UserId == userId))
++            return BadRequest(new { message = "Bu isletmeye zaten yorum yaptiniz." });
++
++        var review = new Review
++        {
++            Id = Guid.NewGuid(),
++            BusinessId = businessId,
++            UserId = userId,
++            Rating = request.Rating,
++            Comment = request.Comment,
++            PhotoUrl = request.PhotoUrl
++        };
++
++        _context.Reviews.Add(review);
++        await _context.SaveChangesAsync();
++
++        return Ok(await MapToResponse(review));
++    }
++
++    [HttpGet]
++    [AllowAnonymous]
++    public async Task<IActionResult> GetReviews(Guid businessId)
++    {
++        var reviews = await _context.Reviews
++            .Where(r => r.BusinessId == businessId && r.IsApproved)
++            .Include(r => r.User)
++            .OrderByDescending(r => r.CreatedAt)
++            .ToListAsync();
++
++        return Ok(reviews.Select(r => MapToResponse(r).Result));
++    }
++
++    private async Task<ReviewResponse> MapToResponse(Review review)
++    {
++        var user = await _context.Users.FindAsync(review.UserId);
++        return new ReviewResponse
++        {
++            Id = review.Id,
++            Rating = review.Rating,
++            Comment = review.Comment,
++            PhotoUrl = review.PhotoUrl,
++            CreatedAt = review.CreatedAt,
++            Username = user!.Username
++        };
++    }
+ }--- Checking WaySpot_rehber_dashboard_kullanici.md (7 files) ---
+
+MISMATCH: backend/WaySpot.API/Controllers/BusinessDashboardController.cs
+--- expected
++++ actual
+@@ -37,7 +37,6 @@
+         var totalReviews = business.Reviews.Count;
+         var avgRating = business.Reviews.Any() ? business.Reviews.Average(r => r.Rating) : 0;
+ 
+-        // Rating dagilimi
+         var ratingDist = Enumerable.Range(1, 5)
+             .Select(r => new RatingDistribution
+             {
+@@ -46,7 +45,6 @@
+             })
+             .ToList();
+ 
+-        // Son 5 yorum
+         var recentReviews = await _context.Reviews
+             .Where(r => r.BusinessId == business.Id && r.IsApproved)
+             .Include(r => r.User)
+@@ -62,7 +60,6 @@
+             })
+             .ToListAsync();
+ 
+-        // Post performanslari (simdilik view count sabit, ileride analytics tablosu eklenebilir)
+         var postPerformances = business.Posts
+             .OrderByDescending(p => p.CreatedAt)
+             .Select(p => new PostPerformance
+@@ -71,7 +68,7 @@
+                 Content = p.Content.Length > 50 ? p.Content[..50] + "..." : p.Content,
+                 CreatedAt = p.CreatedAt,
+                 TargetRadiusKm = p.TargetRadiusKm,
+-                ViewCount = 0 // Analytics tablosu sonraki asamada
++                ViewCount = 0
+             })
+             .ToList();
+ 
+
+MISMATCH: backend/WaySpot.API/Controllers/UserProfileController.cs
+--- expected
++++ actual
+@@ -53,11 +53,9 @@
+         var user = await _context.Users.FindAsync(userId);
+         if (user == null) return NotFound();
+ 
+-        // Mevcut sifre kontrolu
+         if (!_passwordService.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+             return BadRequest(new { message = "Mevcut sifre hatali." });
+ 
+-        // Kullanici adi guncelleme
+         if (!string.IsNullOrWhiteSpace(request.Username) && request.Username != user.Username)
+         {
+             if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+@@ -65,7 +63,6 @@
+             user.Username = request.Username;
+         }
+ 
+-        // Email guncelleme
+         if (!string.IsNullOrWhiteSpace(request.Email) && request.Email != user.Email)
+         {
+             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+@@ -73,7 +70,6 @@
+             user.Email = request.Email;
+         }
+ 
+-        // Sifre degistirme
+         if (!string.IsNullOrWhiteSpace(request.NewPassword))
+         {
+             user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
+
+Check finished.

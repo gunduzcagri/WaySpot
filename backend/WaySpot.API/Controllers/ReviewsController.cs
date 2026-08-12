@@ -62,7 +62,7 @@ public class ReviewsController : ControllerBase
     public async Task<IActionResult> GetReviews(Guid businessId)
     {
         var reviews = await _context.Reviews
-            .Where(r => r.BusinessId == businessId)
+            .Where(r => r.BusinessId == businessId && r.IsApproved)
             .Include(r => r.User)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
