@@ -1,3 +1,35 @@
+# WaySpot - Geliştirme Blueprint'i ve AI Komut Seti
+
+**Proje Adı:** WaySpot
+**Geliştirici:** Çağrı Gündüz
+**Platform:** Web (SPA) ve Mobil Uyumlu Uygulama
+**Ana Amacı:** Yolcular (kullanıcılar) ve işletmeler (firmalar) arasında konum tabanlı, dinamik yarıçaplı sosyal etkileşim ve güzergah planlaması.
+
+---
+
+## 1. Mimari ve Teknoloji Yığını (Tech Stack)
+Yapay zeka (AI) kodlama yaparken **kesinlikle** bu yığını temel almalıdır. Farklı bir teknoloji veya kütüphane teklif etmemelidir.
+
+*   **Backend:** C# .NET Core Web API (MVC mimarisi)
+*   **Veritabanı:** PostgreSQL + **PostGIS** eklentisi (Konum ve mesafe hesaplamaları için zorunlu)
+*   **Frontend:** React.js
+*   **Harita Servisi:** Leaflet.js + OpenStreetMap (OSM) / OSRM (Açık kaynak yönlendirme)
+*   **Konteynerleştirme:** Docker & Docker Compose (Ubuntu / CasaOS yerel sunucu uyumlu yapı)
+*   **Önbellekleme/Proxy:** Cloudflare Workers (API yanıtları ve resimler için)
+*   **Görünürlük:** Generative Engine Optimization (GEO) için yapılandırılmış veri (JSON-LD) entegrasyonu.
+*   **Gelecek AI Entegrasyonu:** Model Context Protocol (MCP) uyumlu API uç noktaları tasarımı.
+
+---
+
+## 2. Temel Kurallar (AI İçin Kesin Talimatlar)
+1.  **Varsayım Yok:** Tanımlanmayan hiçbir özelliği kendin ekleme.
+2.  **Adım Adım İlerleme:** Sana verilen her "Aşama" (Phase) bitmeden ve kullanıcıdan onay almadan diğer aşamaya geçme.
+3.  **Hata Yönetimi:** C# tarafında global exception handler (örneğin IExceptionHandler) kullan. Dinamik nesne hatalarını yakala.
+4.  **Multi-tenant Yapı:** Kullanıcılar (`AppUser`) ve İşletmeler (`Business`) mantıksal olarak ayrılmalı. İşletmelerin şubeleri/mekanları olabilir.
+5.  **Fotoğraf Zorunluluğu:** Yorum ve değerlendirme (Review) oluşturma endpoint'inde `PhotoUrl` null olamaz.
+
+---
+
 # WaySpot - Ultra-Detayli AI Gelistirme Rehberi
 ## (Prompt-by-Prompt Kodlama Kilavuzu)
 
