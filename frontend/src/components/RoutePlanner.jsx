@@ -58,16 +58,16 @@ export default function RoutePlanner() {
     <>
       <div style={{
         position: 'absolute', top: 10, left: 50, zIndex: 1000,
-        background: 'white', padding: '15px', borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.2)', minWidth: '250px'
+        background: 'var(--bg-card)', padding: '24px', borderRadius: '16px',
+        boxShadow: 'var(--shadow-medium)', minWidth: '320px', border: '1px solid var(--border)'
       }}>
-        <h3 style={{ margin: '0 0 10px 0' }}>Rota Planlayici</h3>
-        <input value={start} onChange={e => setStart(e.target.value)} placeholder="Baslangic" style={{ width: '100%', marginBottom: '8px', padding: '6px' }} />
-        <input value={end} onChange={e => setEnd(e.target.value)} placeholder="Bitis" style={{ width: '100%', marginBottom: '8px', padding: '6px' }} />
-        <button onClick={calculateRoute} disabled={loading} style={{ width: '100%', padding: '8px', cursor: 'pointer' }}>
+        <h3 style={{ margin: '0 0 16px 0', color: 'var(--text-primary)', fontSize: '18px', fontWeight: 600 }}>Rota Planlayıcı</h3>
+        <input value={start} onChange={e => setStart(e.target.value)} placeholder="Baslangic" style={{ width: '100%', marginBottom: '12px', padding: '0 16px', height: '56px', borderRadius: '16px', border: '1.5px solid var(--border)', backgroundColor: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '16px', boxSizing: 'border-box' }} />
+        <input value={end} onChange={e => setEnd(e.target.value)} placeholder="Bitis" style={{ width: '100%', marginBottom: '16px', padding: '0 16px', height: '56px', borderRadius: '16px', border: '1.5px solid var(--border)', backgroundColor: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '16px', boxSizing: 'border-box' }} />
+        <button onClick={calculateRoute} disabled={loading} style={{ width: '100%', padding: '0 24px', height: '56px', borderRadius: '16px', background: 'var(--primary)', color: 'var(--text-inverse, #FFFFFF)', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '16px', boxShadow: 'var(--shadow-soft)' }}>
           {loading ? 'Hesaplaniyor...' : 'Rotayi Goster'}
         </button>
-        {route && <p style={{ margin: '10px 0 0 0', fontSize: '14px' }}>Mesafe: {route.distance} km</p>}
+        {route && <p style={{ margin: '16px 0 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>Mesafe: <strong style={{ color: 'var(--text-primary)' }}>{route.distance} km</strong></p>}
       </div>
 
       {route && (
@@ -78,7 +78,7 @@ export default function RoutePlanner() {
           <Marker position={route.end} icon={endIcon}>
             <Popup>Bitis: {end}</Popup>
           </Marker>
-          <Polyline positions={route.coords} color="blue" weight={4} />
+          <Polyline positions={route.coords} color="#2A6B6B" weight={4} />
         </>
       )}
     </>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CardStyleInterpolators } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import AuthNavigator from './AuthNavigator';
@@ -20,7 +21,15 @@ export default function AppNavigator() {
   return (
     <ThemeProvider>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          screenOptions={{
+            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+            transitionSpec: {
+              open: { animation: 'timing', config: { duration: 300 } },
+              close: { animation: 'timing', config: { duration: 250 } },
+            },
+          }}
+        >
           {!user ? (
             <Stack.Screen name="Auth" component={AuthNavigator} />
           ) : (

@@ -19,7 +19,6 @@ public class AdminController : ControllerBase
         _context = context;
     }
 
-    // DASHBOARD ISTATISTIKLERI
     [HttpGet("dashboard")]
     public async Task<IActionResult> GetDashboardStats()
     {
@@ -54,19 +53,25 @@ public class AdminController : ControllerBase
         });
     }
 
-    // KULLANICI YONETIMI
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _context.Users
+            .Include(u => u.Reviews)
+            .Include(u => u.SavedRoutes)
             .Select(u => new AdminUserListResponse
             {
                 Id = u.Id,
                 Username = u.Username,
                 Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                ProfileImage = u.ProfileImage,
                 Role = u.Role,
                 CreatedAt = u.CreatedAt,
-                HasBusiness = u.Business != null
+                HasBusiness = u.Business != null,
+                TotalReviews = u.Reviews.Count,
+                TotalSavedRoutes = u.SavedRoutes.Count
             })
             .OrderByDescending(u => u.CreatedAt)
             .ToListAsync();
@@ -85,7 +90,6 @@ public class AdminController : ControllerBase
         return NoContent();
     }
 
-    // ISLETME YONETIMI
     [HttpGet("businesses")]
     public async Task<IActionResult> GetAllBusinesses()
     {
@@ -97,14 +101,31 @@ public class AdminController : ControllerBase
             {
                 Id = b.Id,
                 Name = b.Name,
+                Type = b.Type,
+                TaxNumber = b.TaxNumber,
                 OwnerEmail = b.User.Email,
+                OwnerName = b.User.FirstName + " " + b.User.LastName,
                 Latitude = b.Location.Y,
                 Longitude = b.Location.X,
+                Address = b.Address,
+                CityId = b.CityId,
+                DistrictId = b.DistrictId,
+                PostalCode = b.PostalCode,
+                Phone = b.Phone,
+                Email = b.Email,
+                Website = b.Website,
+                Instagram = b.Instagram,
+                Facebook = b.Facebook,
+                WhatsApp = b.WhatsApp,
+                CoverImage = b.CoverImage,
+                LogoImage = b.LogoImage,
                 IsActive = b.IsActive,
+                IsVerified = b.IsVerified,
                 PostCount = b.Posts.Count,
                 ReviewCount = b.Reviews.Count,
                 AverageRating = b.Reviews.Any() ? b.Reviews.Average(r => r.Rating) : 0,
-                CreatedAt = b.CreatedAt
+                CreatedAt = b.CreatedAt,
+                UpdatedAt = b.UpdatedAt
             })
             .OrderByDescending(b => b.CreatedAt)
             .ToListAsync();
@@ -119,11 +140,11 @@ public class AdminController : ControllerBase
         if (business == null) return NotFound();
 
         business.IsActive = isActive;
+        business.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return Ok(new { message = $"Isletme durumu {(isActive ? "aktif" : "pasif")} yapildi." });
     }
 
-    // YORUM MODERASYONU
     [HttpGet("reviews/pending")]
     public async Task<IActionResult> GetPendingReviews()
     {

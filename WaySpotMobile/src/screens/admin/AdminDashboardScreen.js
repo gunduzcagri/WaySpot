@@ -3,7 +3,9 @@ import { View, Text, ScrollView, StyleSheet, Alert, TouchableOpacity } from 'rea
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import client from '../../api/client';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import EmptyState from '../../components/EmptyState';
 import { useTheme } from '../../context/ThemeContext';
+import { SPACING, TYPOGRAPHY } from '../../utils/constants';
 
 export default function AdminDashboardScreen() {
   const [stats, setStats] = useState(null);
@@ -26,6 +28,7 @@ export default function AdminDashboardScreen() {
   };
 
   if (loading) return <LoadingSpinner />;
+  if (!stats) return <EmptyState icon="shield-account" title="Henuz veri yok" description="Admin panel verileri yukleniyor." />;
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.bgPage }]}>
@@ -55,17 +58,17 @@ export default function AdminDashboardScreen() {
       </View>
 
       <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>Hizli Erisim</Text>
-      <TouchableOpacity style={[styles.menuItem, { backgroundColor: theme.bgCard }]}>
+      <TouchableOpacity style={[styles.menuItem, { backgroundColor: theme.bgCard, shadowColor: theme.textPrimary }]} activeOpacity={0.7}>
         <Icon name="account-group" size={22} color={theme.primary} />
         <Text style={[styles.menuText, { color: theme.textPrimary }]}>Kullanicilari Yonet</Text>
         <Icon name="chevron-right" size={22} color={theme.textMuted} />
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.menuItem, { backgroundColor: theme.bgCard }]}>
+      <TouchableOpacity style={[styles.menuItem, { backgroundColor: theme.bgCard, shadowColor: theme.textPrimary }]} activeOpacity={0.7}>
         <Icon name="store" size={22} color={theme.primary} />
         <Text style={[styles.menuText, { color: theme.textPrimary }]}>Isletmeleri Yonet</Text>
         <Icon name="chevron-right" size={22} color={theme.textMuted} />
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.menuItem, { backgroundColor: theme.bgCard }]}>
+      <TouchableOpacity style={[styles.menuItem, { backgroundColor: theme.bgCard, shadowColor: theme.textPrimary }]} activeOpacity={0.7}>
         <Icon name="comment-check" size={22} color={theme.primary} />
         <Text style={[styles.menuText, { color: theme.textPrimary }]}>Yorum Moderasyonu</Text>
         <Icon name="chevron-right" size={22} color={theme.textMuted} />
@@ -75,16 +78,16 @@ export default function AdminDashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
-  gridItem: { width: '47%', padding: 16, borderRadius: 16, alignItems: 'center', elevation: 2 },
+  container: { flex: 1, padding: SPACING.lg },
+  header: { ...TYPOGRAPHY.h2, marginBottom: SPACING.lg },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.md, marginBottom: 24 },
+  gridItem: { width: '47%', padding: SPACING.lg, borderRadius: 16, alignItems: 'center', elevation: 2, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
   gridValue: { fontSize: 24, fontWeight: 'bold', marginTop: 8 },
   gridLabel: { fontSize: 12, marginTop: 4 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  sectionTitle: { ...TYPOGRAPHY.h3, marginBottom: SPACING.md },
   menuItem: {
     flexDirection: 'row', alignItems: 'center',
-    padding: 16, marginBottom: 8, borderRadius: 12, elevation: 1,
+    padding: SPACING.md, marginBottom: SPACING.sm, borderRadius: 16, elevation: 1, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2,
   },
   menuText: { flex: 1, fontSize: 15, marginLeft: 12 },
 });

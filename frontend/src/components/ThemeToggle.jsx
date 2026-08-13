@@ -13,7 +13,7 @@ export default function ThemeToggle() {
         background: theme === 'light' ? 'var(--primary)' : 'var(--primary)',
         color: 'var(--primary-text)',
         padding: '10px 16px',
-        borderRadius: '12px',
+        borderRadius: '16px',
         border: 'none',
         cursor: 'pointer',
         fontWeight: 600,

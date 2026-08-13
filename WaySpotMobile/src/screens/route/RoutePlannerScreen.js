@@ -6,6 +6,7 @@ import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
+import { SPACING, TYPOGRAPHY } from '../../utils/constants';
 
 export default function RoutePlannerScreen() {
   const [start, setStart] = useState('Ankara');
@@ -64,18 +65,18 @@ export default function RoutePlannerScreen() {
       >
         {route && (
           <>
-            <Marker coordinate={{ latitude: route.start.lat, longitude: route.start.lng }} title="Baslangic" pinColor="green" />
-            <Marker coordinate={{ latitude: route.end.lat, longitude: route.end.lng }} title="Bitis" pinColor="red" />
+            <Marker coordinate={{ latitude: route.start.lat, longitude: route.start.lng }} title="Baslangic" pinColor={theme.success} />
+            <Marker coordinate={{ latitude: route.end.lat, longitude: route.end.lng }} title="Bitis" pinColor={theme.danger} />
             <Polyline coordinates={route.coords} strokeColor={theme.primary} strokeWidth={4} />
           </>
         )}
       </MapView>
 
       <View style={[styles.panel, { backgroundColor: theme.bgCard, shadowColor: theme.textPrimary }]}>
-        <TextInput style={[styles.input, { backgroundColor: theme.bgInput, borderColor: theme.border, color: theme.textPrimary }]} placeholder="Baslangic (sehir)" value={start} onChangeText={setStart} placeholderTextColor={theme.textMuted} />
-        <TextInput style={[styles.input, { backgroundColor: theme.bgInput, borderColor: theme.border, color: theme.textPrimary }]} placeholder="Bitis (sehir)" value={end} onChangeText={setEnd} placeholderTextColor={theme.textMuted} />
+        <TextInput style={[styles.input, { backgroundColor: theme.bgInput, borderColor: theme.border, color: theme.textPrimary }]} placeholder="Baslangic (sehir)" value={start} onChangeText={setStart} placeholderTextColor={theme.textMuted} accessibilityLabel="Baslangic" accessibilityHint="Baslangic sehrini girin" />
+        <TextInput style={[styles.input, { backgroundColor: theme.bgInput, borderColor: theme.border, color: theme.textPrimary }]} placeholder="Bitis (sehir)" value={end} onChangeText={setEnd} placeholderTextColor={theme.textMuted} accessibilityLabel="Bitis" accessibilityHint="Bitis sehrini girin" />
 
-        <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={calculateRoute} disabled={loading}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={calculateRoute} disabled={loading} activeOpacity={0.7} accessibilityRole="button">
           {loading ? <ActivityIndicator color={theme.textInverse} /> : <Text style={[styles.buttonText, { color: theme.textInverse }]}>Rotayi Hesapla</Text>}
         </TouchableOpacity>
 
@@ -90,16 +91,16 @@ const styles = StyleSheet.create({
   map: { ...StyleSheet.absoluteFillObject },
   panel: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: 20, borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    padding: SPACING.lg, borderTopLeftRadius: 24, borderTopRightRadius: 24,
     shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 10,
   },
   input: {
-    borderWidth: 1, borderRadius: 12,
-    padding: 12, marginBottom: 10, fontSize: 15,
+    height: 56, paddingHorizontal: SPACING.lg, borderRadius: 16,
+    borderWidth: 1, marginBottom: 10, fontSize: 15,
   },
   button: {
-    padding: 14, borderRadius: 12,
-    alignItems: 'center', marginTop: 4,
+    height: 56, paddingHorizontal: SPACING.lg, borderRadius: 16,
+    alignItems: 'center', marginTop: 4, elevation: 2, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4,
   },
   buttonText: { fontSize: 16, fontWeight: '600' },
   distance: { textAlign: 'center', marginTop: 12, fontSize: 16, fontWeight: '700' },

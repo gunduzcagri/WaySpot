@@ -6,7 +6,10 @@ import Geolocation from 'react-native-geolocation-service';
 import client from '../../api/client';
 import PostCard from '../../components/PostCard';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import EmptyState from '../../components/EmptyState';
+import Skeleton from '../../components/Skeleton';
 import { useTheme } from '../../context/ThemeContext';
+import { SPACING, TYPOGRAPHY } from '../../utils/constants';
 
 export default function DiscoverScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
@@ -48,7 +51,29 @@ export default function DiscoverScreen({ navigation }) {
     fetchDiscover();
   }, []);
 
-  if (loading && posts.length === 0) return <LoadingSpinner />;
+  if (loading && posts.length === 0) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.bgPage }]}>
+        {message ? (
+          <View style={[styles.header, { backgroundColor: theme.primary }]}>
+            <Text style={[styles.headerText, { color: theme.textInverse }]}>{message}</Text>
+          </View>
+        ) : null}
+        <View style={{ padding: SPACING.lg }}>
+          {[1, 2, 3].map((i) => (
+            <View key={i} style={{ marginBottom: SPACING.md }}>
+              <Skeleton width="100%" height={180} />
+              <View style={{ padding: SPACING.md }}>
+                <Skeleton width="60%" height={20} />
+                <Skeleton width="100%" height={14} style={{ marginTop: 8 }} />
+                <Skeleton width="40%" height={14} style={{ marginTop: 8 }} />
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.bgPage }]}>
@@ -67,14 +92,16 @@ export default function DiscoverScreen({ navigation }) {
             onPress={() => navigation.navigate('BusinessDetail', { businessId: item.business.id })}
           />
         )}
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ padding: SPACING.lg }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.primary]} />
         }
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={[styles.emptyText, { color: theme.textMuted }]}>Yakinlarda kampanya bulunamadi.</Text>
-          </View>
+          <EmptyState
+            icon="compass-off"
+            title="Yakinlarda kampanya bulunamadi"
+            description="Yeni isletmeler eklenince burada gorunecektir."
+          />
         }
       />
     </View>
@@ -83,8 +110,6 @@ export default function DiscoverScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 12, alignItems: 'center' },
-  headerText: { fontSize: 13, fontWeight: '500' },
-  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 },
-  emptyText: { fontSize: 16 },
+  header: { padding: SPACING.md, alignItems: 'center' },
+  headerText: { ...TYPOGRAPHY.caption },
 });

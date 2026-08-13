@@ -4,6 +4,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../../context/ThemeContext';
+import { SPACING } from '../../utils/constants';
+import FAB from '../../components/FAB';
 
 export default function MapScreen({ navigation }) {
   const [location, setLocation] = useState(null);
@@ -71,13 +73,11 @@ export default function MapScreen({ navigation }) {
         )}
       </MapView>
 
-      <TouchableOpacity style={[styles.locateButton, { backgroundColor: theme.primary }]} onPress={getCurrentLocation}>
+      <TouchableOpacity style={[styles.locateButton, { backgroundColor: theme.primary }]} onPress={getCurrentLocation} activeOpacity={0.7}>
         <Icon name="crosshairs-gps" size={24} color={theme.textInverse} />
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.routeButton, { backgroundColor: theme.secondary }]} onPress={() => navigation.navigate('RoutePlanner')}>
-        <Icon name="routes" size={24} color={theme.textInverse} />
-      </TouchableOpacity>
+      <FAB icon="routes" onPress={() => navigation.navigate('RoutePlanner')} style={{ position: 'absolute', bottom: SPACING.xxxl + 24, right: SPACING.lg, backgroundColor: theme.secondary, shadowColor: theme.textPrimary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 }} />
     </View>
   );
 }
@@ -86,17 +86,9 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { ...StyleSheet.absoluteFillObject },
   locateButton: {
-    position: 'absolute', bottom: 100, right: 16,
-    width: 50, height: 50,
-    borderRadius: 25, justifyContent: 'center', alignItems: 'center',
-    elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25, shadowRadius: 3.84,
-  },
-  routeButton: {
-    position: 'absolute', bottom: 32, right: 16,
-    width: 50, height: 50,
-    borderRadius: 25, justifyContent: 'center', alignItems: 'center',
-    elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25, shadowRadius: 3.84,
+    position: 'absolute', bottom: 100, right: SPACING.lg,
+    width: 64, height: 64,
+    borderRadius: 32, justifyContent: 'center', alignItems: 'center',
+    elevation: 8,
   },
 });

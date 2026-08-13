@@ -8,12 +8,15 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { SPACING, TYPOGRAPHY } from '../../utils/constants';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const theme = useTheme();
@@ -46,17 +49,26 @@ export default function LoginScreen({ navigation }) {
         keyboardType="email-address"
         autoCapitalize="none"
         placeholderTextColor={theme.textMuted}
+        accessibilityLabel="E-posta"
+        accessibilityHint="E-posta adresinizi girin"
       />
-      <TextInput
-        style={[styles.input, { backgroundColor: theme.bgInput, borderColor: theme.border, color: theme.textPrimary }]}
-        placeholder="Sifre"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholderTextColor={theme.textMuted}
-      />
+      <View style={styles.passwordWrapper}>
+        <TextInput
+          style={[styles.input, styles.passwordInput, { backgroundColor: theme.bgInput, borderColor: theme.border, color: theme.textPrimary }]}
+          placeholder="Sifre"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          placeholderTextColor={theme.textMuted}
+          accessibilityLabel="Şifre"
+          accessibilityHint="Şifrenizi girin"
+        />
+        <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword(!showPassword)} accessibilityRole="button" accessibilityLabel="Şifreyi Göster">
+          <Icon name={showPassword ? 'eye-off' : 'eye'} size={24} color={theme.textMuted} />
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={handleLogin} disabled={loading}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={handleLogin} disabled={loading} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Giriş Yap">
         {loading ? (
           <ActivityIndicator color={theme.textInverse} />
         ) : (
@@ -64,7 +76,7 @@ export default function LoginScreen({ navigation }) {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Kayıt Ol Sayfasına Git">
         <Text style={[styles.link, { color: theme.primary }]}>Hesabiniz yok mu? Kayit olun</Text>
       </TouchableOpacity>
     </View>
@@ -72,17 +84,20 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24 },
-  title: { fontSize: 36, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 },
-  subtitle: { fontSize: 18, textAlign: 'center', marginBottom: 32 },
+  container: { flex: 1, justifyContent: 'center', padding: SPACING.lg },
+  title: { ...TYPOGRAPHY.display, textAlign: 'center', marginBottom: 8 },
+  subtitle: { ...TYPOGRAPHY.bodyLarge, textAlign: 'center', marginBottom: SPACING.xl },
   input: {
-    borderWidth: 1, borderRadius: 12,
-    padding: 14, marginBottom: 16, fontSize: 16,
+    height: 56, paddingHorizontal: SPACING.lg, borderRadius: 16,
+    borderWidth: 1, marginBottom: SPACING.md, fontSize: 16,
   },
+  passwordWrapper: { position: 'relative' },
+  passwordInput: { paddingRight: 56 },
+  eyeIcon: { position: 'absolute', right: SPACING.lg, top: 0, bottom: 0, justifyContent: 'center', width: 56, alignItems: 'center' },
   button: {
-    padding: 16, borderRadius: 12,
-    alignItems: 'center', marginTop: 8,
+    height: 56, paddingHorizontal: SPACING.lg, borderRadius: 16,
+    alignItems: 'center', marginTop: 8, elevation: 2, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4,
   },
   buttonText: { fontSize: 16, fontWeight: '600' },
-  link: { textAlign: 'center', marginTop: 20, fontSize: 14 },
+  link: { textAlign: 'center', marginTop: SPACING.lg, fontSize: 14 },
 });

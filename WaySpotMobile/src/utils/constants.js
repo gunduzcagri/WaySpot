@@ -97,3 +97,25 @@ export const COLORS = {
     shadowStrong: 'rgba(0, 0, 0, 0.5)',
   },
 };
+
+export const SPACING = {
+  xs: 8,
+  sm: 12,
+  md: 16,
+  ml: 20,
+  lg: 24,
+  xl: 32,
+  xxl: 40,
+  xxxl: 48,
+};
+
+export const TYPOGRAPHY = {
+  display: { fontSize: 32, lineHeight: 40, letterSpacing: -0.5, fontWeight: '700' },
+  h1: { fontSize: 28, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700' },
+  h2: { fontSize: 22, lineHeight: 30, letterSpacing: -0.2, fontWeight: '600' },
+  h3: { fontSize: 18, lineHeight: 26, letterSpacing: -0.1, fontWeight: '600' },
+  bodyLarge: { fontSize: 16, lineHeight: 24, letterSpacing: 0, fontWeight: '400' },
+  body: { fontSize: 14, lineHeight: 22, letterSpacing: 0, fontWeight: '400' },
+  caption: { fontSize: 12, lineHeight: 18, letterSpacing: 0.2, fontWeight: '500' },
+  overline: { fontSize: 11, lineHeight: 16, letterSpacing: 0.5, fontWeight: '600' },
+};

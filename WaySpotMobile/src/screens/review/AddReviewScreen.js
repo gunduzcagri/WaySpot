@@ -6,6 +6,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import client from '../../api/client';
 import { useTheme } from '../../context/ThemeContext';
+import { SPACING, TYPOGRAPHY } from '../../utils/constants';
 
 export default function AddReviewScreen({ route, navigation }) {
   const { businessId, businessName } = route.params;
@@ -69,7 +70,7 @@ export default function AddReviewScreen({ route, navigation }) {
 
       <View style={styles.ratingContainer}>
         {[1, 2, 3, 4, 5].map((star) => (
-          <TouchableOpacity key={star} onPress={() => setRating(star)}>
+          <TouchableOpacity key={star} onPress={() => setRating(star)} activeOpacity={0.7}>
             <Icon
               name={star <= rating ? 'star' : 'star-outline'}
               size={36}
@@ -101,18 +102,18 @@ export default function AddReviewScreen({ route, navigation }) {
         )}
 
         <View style={styles.photoButtons}>
-          <TouchableOpacity style={[styles.photoButton, { backgroundColor: theme.primary }]} onPress={takePhoto}>
+          <TouchableOpacity style={[styles.photoButton, { backgroundColor: theme.primary }]} onPress={takePhoto} activeOpacity={0.7}>
             <Icon name="camera" size={20} color={theme.textInverse} />
             <Text style={[styles.photoButtonText, { color: theme.textInverse }]}>Kamera</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.photoButton, { backgroundColor: theme.secondary }]} onPress={pickPhoto}>
+          <TouchableOpacity style={[styles.photoButton, { backgroundColor: theme.secondary }]} onPress={pickPhoto} activeOpacity={0.7}>
             <Icon name="image" size={20} color={theme.textInverse} />
             <Text style={[styles.photoButtonText, { color: theme.textInverse }]}>Galeri</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <TouchableOpacity style={[styles.submitButton, { backgroundColor: theme.success }]} onPress={submitReview} disabled={loading}>
+      <TouchableOpacity style={[styles.submitButton, { backgroundColor: theme.success }]} onPress={submitReview} disabled={loading} activeOpacity={0.7}>
         {loading ? <ActivityIndicator color={theme.textInverse} /> : <Text style={[styles.submitText, { color: theme.textInverse }]}>Gonder</Text>}
       </TouchableOpacity>
     </View>
@@ -120,30 +121,30 @@ export default function AddReviewScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 4 },
+  container: { flex: 1, padding: SPACING.lg },
+  title: { ...TYPOGRAPHY.h2, marginBottom: 4 },
   subtitle: { fontSize: 14, marginBottom: 20 },
-  ratingContainer: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginBottom: 24 },
+  ratingContainer: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginBottom: 24 },
   commentInput: {
-    borderWidth: 1, borderRadius: 12,
-    padding: 14, fontSize: 15, minHeight: 100, marginBottom: 20,
+    borderWidth: 1, borderRadius: 16,
+    padding: SPACING.md, fontSize: 15, height: 120, marginBottom: 20,
   },
   photoSection: { marginBottom: 24 },
-  photoPreview: { width: '100%', height: 200, borderRadius: 12, marginBottom: 12 },
+  photoPreview: { width: '100%', height: 200, borderRadius: 16, marginBottom: 12 },
   photoPlaceholder: {
-    width: '100%', height: 150, borderRadius: 12, borderWidth: 2,
+    width: '100%', height: 150, borderRadius: 16, borderWidth: 2,
     borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', marginBottom: 12,
   },
   photoPlaceholderText: { marginTop: 8 },
   photoButtons: { flexDirection: 'row', gap: 12 },
   photoButton: {
     flex: 1, flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'center', padding: 12, borderRadius: 12, gap: 8,
+    justifyContent: 'center', height: 56, borderRadius: 16, gap: 8, elevation: 2, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4,
   },
-  photoButtonText: { fontWeight: '600' },
+  photoButtonText: { fontSize: 14, fontWeight: '600' },
   submitButton: {
-    padding: 16, borderRadius: 12,
-    alignItems: 'center', marginTop: 'auto',
+    height: 56, borderRadius: 16,
+    alignItems: 'center', marginTop: 'auto', elevation: 2, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4,
   },
   submitText: { fontSize: 16, fontWeight: '700' },
 });

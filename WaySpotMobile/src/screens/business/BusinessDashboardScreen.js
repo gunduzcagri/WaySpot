@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import client from '../../api/client';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useTheme } from '../../context/ThemeContext';
+import { SPACING, TYPOGRAPHY } from '../../utils/constants';
 
 export default function BusinessDashboardScreen() {
   const [stats, setStats] = useState(null);
@@ -63,7 +64,7 @@ export default function BusinessDashboardScreen() {
         <Text style={[styles.empty, { color: theme.textMuted }]}>Heniz yorum yok.</Text>
       ) : (
         stats.recentReviews.map((r) => (
-          <View key={r.id} style={[styles.reviewItem, { backgroundColor: theme.bgCard }]}>
+          <View key={r.id} style={[styles.reviewItem, { backgroundColor: theme.bgCard, shadowColor: theme.textPrimary }]}>
             <View style={styles.reviewHeader}>
               <Text style={[styles.reviewUser, { color: theme.textPrimary }]}>{r.username}</Text>
               <View style={styles.ratingBadge}>
@@ -80,15 +81,15 @@ export default function BusinessDashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  cardsRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  card: { flex: 1, padding: 16, borderRadius: 16, alignItems: 'center', elevation: 2 },
+  container: { flex: 1, padding: SPACING.lg },
+  header: { ...TYPOGRAPHY.h2, marginBottom: SPACING.lg },
+  cardsRow: { flexDirection: 'row', gap: SPACING.md, marginBottom: SPACING.md },
+  card: { flex: 1, padding: SPACING.lg, borderRadius: 16, alignItems: 'center', elevation: 2, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
   cardValue: { fontSize: 24, fontWeight: 'bold', marginTop: 8 },
   cardLabel: { fontSize: 12, marginTop: 4 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 12 },
+  sectionTitle: { ...TYPOGRAPHY.h3, marginTop: SPACING.xl, marginBottom: SPACING.md },
   empty: { textAlign: 'center', marginTop: 20 },
-  reviewItem: { padding: 14, borderRadius: 12, marginBottom: 8, elevation: 1 },
+  reviewItem: { padding: SPACING.md, borderRadius: 16, marginBottom: 8, elevation: 1, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2 },
   reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
   reviewUser: { fontWeight: '600' },
   ratingBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },

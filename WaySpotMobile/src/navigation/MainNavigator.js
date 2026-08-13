@@ -8,6 +8,7 @@ import UserProfileScreen from '../screens/profile/UserProfileScreen';
 import BusinessDashboardScreen from '../screens/business/BusinessDashboardScreen';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { SPACING } from '../utils/constants';
 
 const Tab = createBottomTabNavigator();
 
@@ -31,8 +32,9 @@ export default function MainNavigator() {
         },
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.textMuted,
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '500' },
         headerShown: false,
-        tabBarStyle: { backgroundColor: theme.bgCard },
+        tabBarStyle: { backgroundColor: theme.bgCard, paddingTop: SPACING.sm, paddingBottom: SPACING.sm },
       })}
     >
       <Tab.Screen name="Harita" component={MapScreen} />

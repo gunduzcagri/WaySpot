@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaySpot.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d634f189328b62a04bde478ada743c6020fc0ac4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f149204cc781ed338e365883a022a75a0dcbf40")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaySpot.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaySpot.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -2,11 +2,12 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
+import { SPACING } from '../utils/constants';
 
 export default function PostCard({ post, onPress }) {
   const theme = useTheme();
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: theme.bgCard, shadowColor: theme.textPrimary }]} onPress={onPress}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: theme.bgCard, shadowColor: theme.textPrimary }]} onPress={onPress} activeOpacity={0.7}>
       {post.imageUrl && (
         <Image source={{ uri: post.imageUrl }} style={styles.image} resizeMode="cover" />
       )}
@@ -31,15 +32,15 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16, marginBottom: 12,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1, shadowRadius: 4, elevation: 3,
+    shadowOpacity: 0.08, shadowRadius: 4, elevation: 2,
     overflow: 'hidden',
   },
-  image: { width: '100%', height: 160 },
-  content: { padding: 16 },
+  image: { width: '100%', height: 180 },
+  content: { padding: SPACING.md },
   businessName: { fontSize: 16, fontWeight: '700', marginBottom: 6 },
   text: { fontSize: 14, lineHeight: 20, marginBottom: 10 },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  badge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
+  badge: { flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 20 },
   badgeText: { fontSize: 12, marginLeft: 4, fontWeight: '500' },
   date: { fontSize: 12 },
 });

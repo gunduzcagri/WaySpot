@@ -40,6 +40,14 @@ public class UserProfileController : ControllerBase
             Id = user.Id,
             Username = user.Username,
             Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            ProfileImage = user.ProfileImage,
+            Bio = user.Bio,
+            BirthDate = user.BirthDate,
+            Gender = user.Gender,
+            Phone = user.Phone,
+            CityId = user.CityId,
             CreatedAt = user.CreatedAt,
             TotalReviews = user.Reviews.Count,
             TotalSavedRoutes = user.SavedRoutes.Count
@@ -53,31 +61,48 @@ public class UserProfileController : ControllerBase
         var user = await _context.Users.FindAsync(userId);
         if (user == null) return NotFound();
 
-        // Mevcut sifre kontrolu
         if (!_passwordService.VerifyPassword(request.CurrentPassword, user.PasswordHash))
             return BadRequest(new { message = "Mevcut sifre hatali." });
 
-        // Kullanici adi guncelleme
         if (!string.IsNullOrWhiteSpace(request.Username) && request.Username != user.Username)
         {
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+            if (await _context.Users.AnyAsync(u => u.Username == request.Username && u.Id != userId))
                 return BadRequest(new { message = "Bu kullanici adi zaten kullaniliyor." });
             user.Username = request.Username;
         }
 
-        // Email guncelleme
         if (!string.IsNullOrWhiteSpace(request.Email) && request.Email != user.Email)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email && u.Id != userId))
                 return BadRequest(new { message = "Bu e-posta zaten kullaniliyor." });
             user.Email = request.Email;
         }
 
-        // Sifre degistirme
+        if (!string.IsNullOrWhiteSpace(request.FirstName))
+            user.FirstName = request.FirstName;
+
+        if (!string.IsNullOrWhiteSpace(request.LastName))
+            user.LastName = request.LastName;
+
+        if (request.Bio != null)
+            user.Bio = request.Bio;
+
+        if (request.BirthDate.HasValue)
+            user.BirthDate = request.BirthDate;
+
+        if (request.Gender != null)
+            user.Gender = request.Gender;
+
+        if (request.Phone != null)
+            user.Phone = request.Phone;
+
+        if (request.CityId != null)
+            user.CityId = request.CityId;
+
         if (!string.IsNullOrWhiteSpace(request.NewPassword))
-        {
             user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
-        }
+
+        user.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return Ok(new { message = "Profil guncellendi." });
