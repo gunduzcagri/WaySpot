@@ -1,0 +1,6 @@
+Admin: admin@wayspot.com / admin123
+Cafe Business: cafe@wayspot.com / business123
+Gym Business: gym@wayspot.com / business123
+Market Business: market@wayspot.com / business123
+Normal User: ahmet@example.com / user123
+Normal User: elif@example.com / user456

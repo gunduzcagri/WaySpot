@@ -5,13 +5,16 @@
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/WaySpot.API.csproj.CoreCompileInputs.cache
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/WaySpot.API.MvcApplicationPartsAssemblyInfo.cs
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/WaySpot.API.MvcApplicationPartsAssemblyInfo.cache
+/media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/EFCoreNpgsqlNetTopologySuite.cs
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/WaySpot.API.sourcelink.json
+/media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/appsettings.Development.json
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/appsettings.json
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.API
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.API.deps.json
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.API.runtimeconfig.json
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.API.dll
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.API.pdb
+/media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/BCrypt.Net-Next.dll
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/Humanizer.dll
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
@@ -108,7 +111,6 @@
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.Infrastructure.dll
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.Core.pdb
 /media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/WaySpot.Infrastructure.pdb
-/media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/EFCoreNpgsqlNetTopologySuite.cs
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/staticwebassets.build.json
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/staticwebassets.development.json
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/staticwebassets/msbuild.WaySpot.API.Microsoft.AspNetCore.StaticWebAssets.props
@@ -123,5 +125,3 @@
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/WaySpot.API.pdb
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/WaySpot.API.genruntimeconfig.cache
 /media/cagri/iki/WaySpot/backend/WaySpot.API/obj/Debug/net8.0/ref/WaySpot.API.dll
-/media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/BCrypt.Net-Next.dll
-/media/cagri/iki/WaySpot/backend/WaySpot.API/bin/Debug/net8.0/appsettings.Development.json

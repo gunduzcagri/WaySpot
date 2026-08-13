@@ -22,59 +22,45 @@ public class DiscoverController : ControllerBase
     {
         var userLocation = new Point(request.Longitude, request.Latitude) { SRID = 4326 };
 
-        var radii = new[] { 20000.0, 50000.0, 100000.0, 150000.0 };
-        var radiusLabels = new[] { 20.0, 50.0, 100.0, 150.0 };
+        var posts = await _context.Posts
+            .Include(p => p.Business)
+            .Include(p => p.User)
+            .Where(p => p.IsActive && p.Business.IsActive)
+            .OrderByDescending(p => p.CreatedAt)
+            .Take(50)
+            .ToListAsync();
 
-        List<PostResponse> results = new();
-        double appliedRadius = 0;
-
-        for (int i = 0; i < radii.Length; i++)
+        var results = posts.Select(p => new PostResponse
         {
-            var radiusMeters = radii[i];
-
-            var posts = await _context.Posts
-                .Include(p => p.Business)
-                .Where(p => p.Business.IsActive &&
-                    EF.Functions.IsWithinDistance(
-                        p.Business.Location,
-                        userLocation,
-                        radiusMeters,
-                        true))
-                .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
-
-            if (posts.Count >= 30 || i == radii.Length - 1)
+            Id = p.Id,
+            Content = p.Content,
+            ImageUrl = p.ImageUrl,
+            TargetRadiusKm = p.TargetRadiusKm,
+            CreatedAt = p.CreatedAt,
+            Business = p.Business != null ? new BusinessResponse
             {
-                results = posts.Select(p => new PostResponse
-                {
-                    Id = p.Id,
-                    Content = p.Content,
-                    ImageUrl = p.ImageUrl,
-                    TargetRadiusKm = p.TargetRadiusKm,
-                    CreatedAt = p.CreatedAt,
-                    Business = new BusinessResponse
-                    {
-                        Id = p.Business.Id,
-                        Name = p.Business.Name,
-                        Description = p.Business.Description,
-                        Latitude = p.Business.Location.Y,
-                        Longitude = p.Business.Location.X,
-                        IsActive = p.Business.IsActive,
-                        CreatedAt = p.Business.CreatedAt
-                    }
-                }).ToList();
-
-                appliedRadius = radiusLabels[i];
-                break;
-            }
-        }
+                Id = p.Business.Id,
+                Name = p.Business.Name,
+                Description = p.Business.Description,
+                Latitude = p.Business.Location.Y,
+                Longitude = p.Business.Location.X,
+                IsActive = p.Business.IsActive,
+                CreatedAt = p.Business.CreatedAt
+            } : null,
+            User = p.User != null ? new UserResponse
+            {
+                Id = p.User.Id,
+                Username = p.User.Username,
+                Email = p.User.Email
+            } : null
+        }).ToList();
 
         return Ok(new DiscoverResponse
         {
             Posts = results,
-            AppliedRadiusKm = appliedRadius,
+            AppliedRadiusKm = 0,
             TotalCount = results.Count,
-            Message = $"{appliedRadius} km yaricap icinde {results.Count} sonuc bulundu."
+            Message = $"{results.Count} sonuc bulundu."
         });
     }
 }

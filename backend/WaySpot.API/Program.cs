@@ -136,6 +136,15 @@ if (securitySettings.EnableSwagger)
 
 var app = builder.Build();
 
+Console.WriteLine("CONNECTION=" + builder.Configuration.GetConnectionString("DefaultConnection"));
+Console.WriteLine("ENV=" + app.Environment.EnvironmentName);
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<WaySpotDbContext>();
+    db.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     var devSettings = app.Configuration.GetSection("Security").Get<SecuritySettings>() ?? new SecuritySettings();

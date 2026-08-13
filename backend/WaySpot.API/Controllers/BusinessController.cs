@@ -50,7 +50,10 @@ public class BusinessController : ControllerBase
             Website = request.Website,
             Instagram = request.Instagram,
             Facebook = request.Facebook,
-            WhatsApp = request.WhatsApp
+            WhatsApp = request.WhatsApp,
+            IsActive = true,
+            IsVerified = false,
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Businesses.Add(business);
@@ -232,18 +235,7 @@ public class BusinessController : ControllerBase
             Description = b.Description,
             Latitude = b.Location.Y,
             Longitude = b.Location.X,
-            Address = b.Address,
             CityId = b.CityId,
-            DistrictId = b.DistrictId,
-            PostalCode = b.PostalCode,
-            Phone = b.Phone,
-            Email = b.Email,
-            Website = b.Website,
-            Instagram = b.Instagram,
-            Facebook = b.Facebook,
-            WhatsApp = b.WhatsApp,
-            CoverImage = b.CoverImage,
-            LogoImage = b.LogoImage,
             IsActive = b.IsActive,
             IsVerified = b.IsVerified,
             CreatedAt = b.CreatedAt,

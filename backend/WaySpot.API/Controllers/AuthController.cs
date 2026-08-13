@@ -50,7 +50,8 @@ public class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok(_jwtService.GenerateToken(user));
+        var authResponse = _jwtService.GenerateToken(user);
+        return Ok(authResponse);
     }
 
     [HttpPost("login")]
@@ -63,7 +64,19 @@ public class AuthController : ControllerBase
             return StatusCode(StatusCodes.Status429TooManyRequests, new { message = "Too many failed login attempts. Please try again later." });
         }
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var user = await _context.Users
+            .Where(u => u.Email == request.Email)
+            .Select(u => new AppUser
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+                PasswordHash = u.PasswordHash,
+                Role = u.Role,
+                CreatedAt = u.CreatedAt
+            })
+            .FirstOrDefaultAsync();
+
         if (user == null)
         {
             await _bruteForceProtection.RecordFailedLoginAsync(ip);
@@ -78,7 +91,8 @@ public class AuthController : ControllerBase
 
         await _bruteForceProtection.ResetFailedLoginAsync(ip);
 
-        return Ok(_jwtService.GenerateToken(user));
+        var authResponse = _jwtService.GenerateToken(user);
+        return Ok(authResponse);
     }
 
     [HttpPost("google")]
@@ -93,10 +107,32 @@ public class AuthController : ControllerBase
         var firstName = payload.GetValueOrDefault("given_name")?.ToString() ?? string.Empty;
         var lastName = payload.GetValueOrDefault("family_name")?.ToString() ?? string.Empty;
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
+        var user = await _context.Users
+            .Where(u => u.GoogleId == googleId)
+            .Select(u => new AppUser
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+                PasswordHash = u.PasswordHash,
+                Role = u.Role,
+                CreatedAt = u.CreatedAt
+            })
+            .FirstOrDefaultAsync();
         if (user == null)
         {
-            user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            user = await _context.Users
+                .Where(u => u.Email == email)
+                .Select(u => new AppUser
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    PasswordHash = u.PasswordHash,
+                    Role = u.Role,
+                    CreatedAt = u.CreatedAt
+                })
+                .FirstOrDefaultAsync();
             if (user == null)
             {
                 var username = $"{firstName}{lastName}{Guid.NewGuid().ToString()[..4]}";
@@ -110,7 +146,8 @@ public class AuthController : ControllerBase
                     GoogleId = googleId,
                     EmailConfirmed = true,
                     Role = UserRole.User,
-                    PasswordHash = _passwordService.HashPassword(Guid.NewGuid().ToString())
+                    PasswordHash = _passwordService.HashPassword(Guid.NewGuid().ToString()),
+                    CreatedAt = DateTime.UtcNow
                 };
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
