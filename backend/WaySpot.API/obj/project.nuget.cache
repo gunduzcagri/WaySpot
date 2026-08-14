@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XgNNsX1iTXU=",
+  "dgSpecHash": "bX5Fniq6f4Y=",
   "success": true,
-  "projectFilePath": "/media/cagri/iki/WaySpot/backend/WaySpot.API/WaySpot.API.csproj",
+  "projectFilePath": "/media/cagri/iki1/WaySpot/backend/WaySpot.API/WaySpot.API.csproj",
   "expectedPackageFiles": [
     "/home/cagri/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/home/cagri/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",

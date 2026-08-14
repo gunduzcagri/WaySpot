@@ -1,3 +1,5 @@
+using WaySpot.Core.Entities;
+
 namespace WaySpot.Core.DTOs;
 
 public class BusinessResponse
@@ -21,8 +23,16 @@ public class BusinessResponse
     public string? WhatsApp { get; set; }
     public string? CoverImage { get; set; }
     public string? LogoImage { get; set; }
+    public decimal AverageRating { get; set; }
+    public int TotalReviews { get; set; }
+    public int TotalLikes { get; set; }
+    public int TotalSaves { get; set; }
+    public bool IsFeatured { get; set; }
+    public string[] Tags { get; set; } = Array.Empty<string>();
     public bool IsActive { get; set; }
     public bool IsVerified { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public List<BusinessHour> BusinessHours { get; set; } = new();
+    public List<BusinessImage> BusinessImages { get; set; } = new();
 }

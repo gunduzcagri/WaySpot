@@ -1,131 +1,170 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import axios from 'axios';
+import { api } from '../services/api';
 
-let DefaultIcon = L.icon({
-  iconUrl: '/images/marker-icon.png',
-  shadowUrl: '/images/marker-shadow.png',
+// Reliable Leaflet Icon configurations using unpkg CDN
+const userIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [25, 41],
-  iconAnchor: [12, 41]
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
-L.Marker.prototype.options.icon = DefaultIcon;
+
+const businessIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-teal.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+function MapController({ center, onCenterChange }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const handleFocus = (e) => {
+      if (e.detail?.lat && e.detail?.lng) {
+        map.flyTo([e.detail.lat, e.detail.lng], 16, { duration: 1.2 });
+      }
+    };
+    window.addEventListener('wayspot-focus-map', handleFocus);
+    return () => window.removeEventListener('wayspot-focus-map', handleFocus);
+  }, [map]);
+
+  useMapEvents({
+    moveend: () => {
+      if (onCenterChange) {
+        const c = map.getCenter();
+        onCenterChange({ lat: c.lat, lng: c.lng });
+      }
+    }
+  });
+
+  return null;
+}
 
 function LocationMarker({ position, setPosition }) {
   const map = useMap();
 
   useEffect(() => {
-    map.locate({ setView: true, maxZoom: 13 });
+    map.locate({ setView: false, maxZoom: 14 });
 
-    map.on('locationfound', (e) => {
+    const handleFound = (e) => {
       setPosition(e.latlng);
-    });
+    };
 
-    map.on('locationerror', () => {
+    const handleError = () => {
       setPosition({ lat: 39.9334, lng: 32.8597 });
-      map.setView([39.9334, 32.8597], 13);
-    });
+    };
+
+    map.on('locationfound', handleFound);
+    map.on('locationerror', handleError);
+
+    return () => {
+      map.off('locationfound', handleFound);
+      map.off('locationerror', handleError);
+    };
   }, [map, setPosition]);
 
   return position ? (
-    <Marker position={position}>
-      <Popup>Konumunuz</Popup>
+    <Marker position={position} icon={userIcon}>
+      <Popup>
+        <div style={{ fontWeight: 600, color: 'var(--primary)' }}>
+          📍 Konumunuz
+        </div>
+      </Popup>
     </Marker>
   ) : null;
 }
 
-function MapEventsHandler({ onCenterChange }) {
-  const map = useMapEvents({
-    moveend: () => {
-      if (onCenterChange) {
-        const center = map.getCenter();
-        onCenterChange({ lat: center.lat, lng: center.lng });
-      }
-    }
-  });
-  return null;
-}
-
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5075/api';
-
-const businessIcon = new L.Icon({
-  iconUrl: '/images/marker-icon.png',
-  shadowUrl: '/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41]
-});
-
-function AllBusinessMarkers() {
-  const map = useMap();
+function BusinessMarkers() {
   const [businesses, setBusinesses] = useState([]);
 
-  const fetchBusinesses = async (center) => {
+  const loadBusinesses = async () => {
     try {
-      const res = await axios.get(`${API_URL}/geo/nearby?latitude=${center.lat}&longitude=${center.lng}&radius=50000`);
-      if (res.data && res.data.businesses) {
-        setBusinesses(res.data.businesses);
-      } else {
-        // Fallback mock businesses if API is failing/empty
-        setBusinesses([
-          { id: 'm1', name: 'Kaleiçi Tarihi Kahvecisi', description: 'Nefis Türk kahvesi.', latitude: 36.885, longitude: 30.705 },
-          { id: 'm2', name: 'Konyaaltı Balıkçısı', description: 'Taze deniz ürünleri.', latitude: 36.865, longitude: 30.635 },
-          { id: 'm3', name: 'Lara Dondurmacısı', description: 'Sıcak günlerde serinletici.', latitude: 36.852, longitude: 30.755 },
-          { id: 'm4', name: 'Düden Şelalesi Restoranı', description: 'Şelale manzaralı.', latitude: 36.966, longitude: 30.725 },
-          { id: 'm5', name: 'Antalya Müzesi Kafe', description: 'Tarih ve kahve bir arada.', latitude: 36.885, longitude: 30.679 }
-        ]);
+      const res = await api.get('/Feed?pageSize=50&filter=popular');
+      if (res.data?.data) {
+        setBusinesses(res.data.data);
       }
     } catch (err) {
-      console.error('Isletmeleri getirme hatasi:', err);
-      setBusinesses([
-        { id: 'm1', name: 'Kaleiçi Tarihi Kahvecisi', description: 'Nefis Türk kahvesi.', latitude: 36.885, longitude: 30.705 },
-        { id: 'm2', name: 'Konyaaltı Balıkçısı', description: 'Taze deniz ürünleri.', latitude: 36.865, longitude: 30.635 },
-        { id: 'm3', name: 'Lara Dondurmacısı', description: 'Sıcak günlerde serinletici.', latitude: 36.852, longitude: 30.755 }
-      ]);
+      console.error('Harita işletme yükleme hatası:', err);
     }
   };
 
   useEffect(() => {
-    fetchBusinesses(map.getCenter());
-  }, [map]);
+    loadBusinesses();
+  }, []);
 
-  useMapEvents({
-    moveend: () => {
-      fetchBusinesses(map.getCenter());
-    }
-  });
-
-  return businesses.map(b => (
-    <Marker key={b.id} position={[b.latitude, b.longitude]} icon={businessIcon}>
-      <Popup>
-        <div style={{ minWidth: '180px', color: '#111827' }}>
-          <h4 style={{ margin: '0 0 6px 0', fontSize: '16px', fontWeight: 600 }}>{b.name}</h4>
-          <p style={{ margin: '0', fontSize: '13px', color: '#4B5563' }}>{b.description}</p>
-        </div>
-      </Popup>
-    </Marker>
-  ));
+  return (
+    <>
+      {businesses.map((b) => {
+        if (!b.latitude || !b.longitude) return null;
+        return (
+          <Marker key={b.id} position={[b.latitude, b.longitude]} icon={businessIcon}>
+            <Popup>
+              <div className="custom-map-popup" style={{ minWidth: 160 }}>
+                {b.coverImage && (
+                  <img
+                    src={b.coverImage}
+                    alt={b.name}
+                    style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }}
+                  />
+                )}
+                <h4>{b.name}</h4>
+                <p>{b.type} · ⭐ {b.averageRating ? Number(b.averageRating).toFixed(1) : '5.0'}</p>
+                <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8 }}>
+                  {b.address || ''}
+                </div>
+                <a
+                  href={`/business/${b.id}`}
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: 'var(--primary, #2A6B6B)',
+                    color: '#ffffff',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textDecoration: 'none'
+                  }}
+                >
+                  Detayları Gör
+                </a>
+              </div>
+            </Popup>
+          </Marker>
+        );
+      })}
+    </>
+  );
 }
 
 export default function MapView({ children, onCenterChange }) {
-  const [position, setPosition] = useState(null);
+  const [position, setPosition] = useState({ lat: 39.9334, lng: 32.8597 });
 
   return (
-    <MapContainer
-      center={[39.9334, 32.8597]}
-      zoom={13}
-      scrollWheelZoom={true}
-      style={{ height: '100vh', width: '100%' }}
-    >
-      <MapEventsHandler onCenterChange={onCenterChange} />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <LocationMarker position={position} setPosition={setPosition} />
-      <AllBusinessMarkers />
-      {children}
-    </MapContainer>
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+      <MapContainer
+        center={[39.9334, 32.8597]}
+        zoom={13}
+        scrollWheelZoom={true}
+        style={{ width: '100%', height: '100%', zIndex: 1 }}
+      >
+        <MapController onCenterChange={onCenterChange} />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <LocationMarker position={position} setPosition={setPosition} />
+        <BusinessMarkers />
+        {children}
+      </MapContainer>
+    </div>
   );
 }

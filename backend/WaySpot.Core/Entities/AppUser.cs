@@ -26,4 +26,6 @@ public class AppUser
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<SavedRoute> SavedRoutes { get; set; } = new List<SavedRoute>();
     public ICollection<Share> Shares { get; set; } = new List<Share>();
+    public ICollection<Route> Routes { get; set; } = new List<Route>();
+    public ICollection<SavedBusiness> SavedBusinesses { get; set; } = new List<SavedBusiness>();
 }

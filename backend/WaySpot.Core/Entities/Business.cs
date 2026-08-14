@@ -25,6 +25,14 @@ public class Business
     public string? LogoImage { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsVerified { get; set; } = false;
+    
+    public decimal AverageRating { get; set; } = 0;
+    public int TotalReviews { get; set; } = 0;
+    public int TotalLikes { get; set; } = 0;
+    public int TotalSaves { get; set; } = 0;
+    public bool IsFeatured { get; set; } = false;
+    public string[] Tags { get; set; } = Array.Empty<string>();
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
@@ -33,4 +41,5 @@ public class Business
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<BusinessHour> BusinessHours { get; set; } = new List<BusinessHour>();
     public ICollection<BusinessImage> BusinessImages { get; set; } = new List<BusinessImage>();
+    public ICollection<SavedBusiness> SavedByUsers { get; set; } = new List<SavedBusiness>();
 }

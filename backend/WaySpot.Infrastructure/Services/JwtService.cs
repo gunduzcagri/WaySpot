@@ -1,51 +1,31 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WaySpot.Core.DTOs;
 using WaySpot.Core.Entities;
 using WaySpot.Core.Interfaces;
-using WaySpot.Core.Models;
 
 namespace WaySpot.Infrastructure.Services;
 
 public class JwtService : IJwtService
 {
     private readonly IConfiguration _config;
-    private readonly SecuritySettings _securitySettings;
 
-    public JwtService(IConfiguration config, IOptions<SecuritySettings> securitySettings)
+    public JwtService(IConfiguration config)
     {
         _config = config;
-        _securitySettings = securitySettings.Value;
     }
 
     public AuthResponse GenerateToken(AppUser user)
     {
-        SigningCredentials creds;
-        
-        if (_securitySettings.LocalDevBypass)
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-            creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        }
-        else
-        {
-            if (!File.Exists("jwt-key.pem"))
-            {
-                var newRsa = RSA.Create();
-                File.WriteAllText("jwt-key.pem", newRsa.ExportRSAPrivateKeyPem());
-            }
-            var rsaKey = RSA.Create();
-            rsaKey.ImportFromPem(File.ReadAllText("jwt-key.pem").ToCharArray());
-            var key = new RsaSecurityKey(rsaKey);
-            creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
-        }
+        var jwtKey = _config["Jwt:Key"] ?? "wayspot_super_secret_key_2024_must_be_at_least_32_chars!";
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var expireDays = int.Parse(_config["Jwt:ExpireDays"]!);
+        var expireDaysStr = _config["Jwt:ExpireDays"];
+        var expireDays = int.TryParse(expireDaysStr, out var d) ? d : 7;
         var expires = DateTime.UtcNow.AddDays(expireDays);
 
         var claims = new[]
@@ -57,8 +37,8 @@ public class JwtService : IJwtService
         };
 
         var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
+            issuer: _config["Jwt:Issuer"] ?? "WaySpotAPI",
+            audience: _config["Jwt:Audience"] ?? "WaySpotClient",
             claims: claims,
             expires: expires,
             signingCredentials: creds
@@ -69,8 +49,8 @@ public class JwtService : IJwtService
             Token = new JwtSecurityTokenHandler().WriteToken(token),
             Username = user.Username,
             Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
+            FirstName = user.FirstName ?? string.Empty,
+            LastName = user.LastName ?? string.Empty,
             ProfileImage = user.ProfileImage,
             Role = user.Role,
             ExpiresAt = expires

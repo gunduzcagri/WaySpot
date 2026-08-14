@@ -224,6 +224,71 @@ public class BusinessController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("{id:guid}/like")]
+    public async Task<IActionResult> LikeBusiness(Guid id)
+    {
+        var business = await _context.Businesses.FindAsync(id);
+        if (business == null) return NotFound();
+
+        business.TotalLikes++;
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Isletme begenildi.", TotalLikes = business.TotalLikes });
+    }
+
+    [HttpPost("{id:guid}/save")]
+    public async Task<IActionResult> SaveBusiness(Guid id)
+    {
+        var userId = GetCurrentUserId();
+        var business = await _context.Businesses.FindAsync(id);
+        if (business == null) return NotFound();
+
+        if (await _context.SavedBusinesses.AnyAsync(s => s.BusinessId == id && s.UserId == userId))
+            return BadRequest(new { message = "Bu isletme zaten kaydedilmis." });
+
+        _context.SavedBusinesses.Add(new SavedBusiness
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            BusinessId = id
+        });
+        
+        business.TotalSaves++;
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Isletme kaydedildi." });
+    }
+
+    [HttpDelete("{id:guid}/save")]
+    public async Task<IActionResult> UnsaveBusiness(Guid id)
+    {
+        var userId = GetCurrentUserId();
+        var saved = await _context.SavedBusinesses.FirstOrDefaultAsync(s => s.BusinessId == id && s.UserId == userId);
+        if (saved == null) return NotFound();
+
+        _context.SavedBusinesses.Remove(saved);
+        
+        var business = await _context.Businesses.FindAsync(id);
+        if (business != null && business.TotalSaves > 0)
+        {
+            business.TotalSaves--;
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Isletme kaydedilenlerden cikarildi." });
+    }
+
+    [HttpGet("saved")]
+    public async Task<IActionResult> GetSavedBusinesses()
+    {
+        var userId = GetCurrentUserId();
+        var saved = await _context.SavedBusinesses
+            .Include(s => s.Business)
+            .Where(s => s.UserId == userId)
+            .Select(s => MapToResponse(s.Business))
+            .ToListAsync();
+
+        return Ok(saved);
+    }
+
     private static BusinessResponse MapToResponse(Business b)
     {
         return new BusinessResponse
@@ -236,10 +301,29 @@ public class BusinessController : ControllerBase
             Latitude = b.Location.Y,
             Longitude = b.Location.X,
             CityId = b.CityId,
+            DistrictId = b.DistrictId,
+            PostalCode = b.PostalCode,
+            Address = b.Address,
+            Phone = b.Phone,
+            Email = b.Email,
+            Website = b.Website,
+            Instagram = b.Instagram,
+            Facebook = b.Facebook,
+            WhatsApp = b.WhatsApp,
+            CoverImage = b.CoverImage,
+            LogoImage = b.LogoImage,
+            AverageRating = b.AverageRating,
+            TotalReviews = b.TotalReviews,
+            TotalLikes = b.TotalLikes,
+            TotalSaves = b.TotalSaves,
+            IsFeatured = b.IsFeatured,
+            Tags = b.Tags ?? Array.Empty<string>(),
             IsActive = b.IsActive,
             IsVerified = b.IsVerified,
             CreatedAt = b.CreatedAt,
-            UpdatedAt = b.UpdatedAt
+            UpdatedAt = b.UpdatedAt,
+            BusinessHours = b.BusinessHours?.ToList() ?? new List<BusinessHour>(),
+            BusinessImages = b.BusinessImages?.ToList() ?? new List<BusinessImage>()
         };
     }
 }

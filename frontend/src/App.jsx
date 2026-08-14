@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import MapView from './components/MapView';
 import RoutePlanner from './components/RoutePlanner';
@@ -11,7 +11,12 @@ import UserProfilePage from './pages/UserProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import SharePage from './pages/SharePage';
 import TestDataPage from './pages/TestDataPage';
+import BusinessDetailPage from './pages/BusinessDetailPage';
 import ThemeToggle from './components/ThemeToggle';
+import { Map, Navigation, Compass, PlusCircle, User, Settings, Sparkles } from 'lucide-react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -19,46 +24,149 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-function MapLayout() {
-  const [mapCenter, setMapCenter] = useState({ lat: 39.9334, lng: 32.8597 });
+function MainLayout({ children, isMapPage = false, mobileTab = 'map', setMobileTab }) {
+  const location = useLocation();
+  const navigate = useNavigate();
 
   return (
-    <>
-      <ThemeToggle />
-      <nav style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 1001, display: 'flex', gap: 8, background: 'rgba(20,22,26,0.85)', padding: '8px 12px', borderRadius: 999, border: '1px solid var(--border)', backdropFilter: 'blur(8px)' }}>
-        <NavLink to="/" style={navStyle} end>Harita</NavLink>
-        <NavLink to="/share" style={navStyle}>Paylaş</NavLink>
-        <NavLink to="/profile" style={navStyle}>Profil</NavLink>
-        <NavLink to="/business/dashboard" style={navStyle}>İşletme</NavLink>
-        <NavLink to="/settings" style={navStyle}>Ayarlar</NavLink>
-        <NavLink to="/test-data" style={{ ...navStyle, color: '#f59e0b' }}>Test</NavLink>
+    <div className={`app-root-layout ${isMapPage ? 'is-map-view' : 'is-page-view'}`}>
+      {/* Desktop Top Navbar (Always rendered across all pages) */}
+      <nav className="desktop-navbar">
+        <NavLink to="/" className={({ isActive }) => `desktop-nav-link ${isActive && location.pathname === '/' ? 'active' : ''}`} end>
+          <Map size={15} /> Harita
+        </NavLink>
+        <NavLink to="/share" className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}>
+          <PlusCircle size={15} /> Paylaş
+        </NavLink>
+        <NavLink to="/profile" className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}>
+          <User size={15} /> Profil
+        </NavLink>
+        <NavLink to="/business/dashboard" className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}>
+          İşletme
+        </NavLink>
+        <NavLink to="/settings" className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}>
+          <Settings size={15} /> Ayarlar
+        </NavLink>
+        <NavLink to="/test-data" className={({ isActive }) => `desktop-nav-link test-link ${isActive ? 'active' : ''}`}>
+          <Sparkles size={14} /> Test
+        </NavLink>
       </nav>
-      <MapView onCenterChange={setMapCenter}>
-        <RoutePlanner />
-        <FeedPage center={mapCenter} />
-      </MapView>
-    </>
+
+      <ThemeToggle />
+
+      {/* Page Body */}
+      <div className={`app-main-content ${!isMapPage ? 'subpage-container' : ''}`}>
+        {children}
+      </div>
+
+      {/* Mobile Bottom Navigation Bar (Always rendered across all pages on mobile) */}
+      <nav className="mobile-bottom-navbar">
+        <button 
+          onClick={() => {
+            if (location.pathname !== '/') {
+              navigate('/?tab=map');
+            } else if (setMobileTab) {
+              setMobileTab('map');
+            }
+          }} 
+          className={`mobile-nav-btn ${location.pathname === '/' && mobileTab === 'map' ? 'active' : ''}`}
+        >
+          <Map size={20} />
+          <span>Harita</span>
+        </button>
+
+        <button 
+          onClick={() => {
+            if (location.pathname !== '/') {
+              navigate('/?tab=route');
+            } else if (setMobileTab) {
+              setMobileTab('route');
+            }
+          }} 
+          className={`mobile-nav-btn ${location.pathname === '/' && mobileTab === 'route' ? 'active' : ''}`}
+        >
+          <Navigation size={20} />
+          <span>Rota</span>
+        </button>
+
+        <button 
+          onClick={() => {
+            if (location.pathname !== '/') {
+              navigate('/?tab=feed');
+            } else if (setMobileTab) {
+              setMobileTab('feed');
+            }
+          }} 
+          className={`mobile-nav-btn ${location.pathname === '/' && mobileTab === 'feed' ? 'active' : ''}`}
+        >
+          <Compass size={20} />
+          <span>Keşfet</span>
+        </button>
+
+        <NavLink to="/share" className={({ isActive }) => `mobile-nav-btn ${isActive ? 'active' : ''}`}>
+          <PlusCircle size={20} />
+          <span>Paylaş</span>
+        </NavLink>
+
+        <NavLink to="/profile" className={({ isActive }) => `mobile-nav-btn ${isActive ? 'active' : ''}`}>
+          <User size={20} />
+          <span>Profil</span>
+        </NavLink>
+      </nav>
+    </div>
   );
 }
 
-const navStyle = { color: '#cbd5e1', textDecoration: 'none', fontSize: 13, fontWeight: 500, padding: '6px 10px', borderRadius: 999, transition: 'background .2s' };
+function MapLayout() {
+  const [mapCenter, setMapCenter] = useState({ lat: 39.9334, lng: 32.8597 });
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'map';
+  const [mobileTab, setMobileTab] = useState(initialTab);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['map', 'route', 'feed'].includes(tabParam)) {
+      setMobileTab(tabParam);
+    }
+  }, [searchParams]);
+
+  return (
+    <MainLayout isMapPage={true} mobileTab={mobileTab} setMobileTab={setMobileTab}>
+      <MapView onCenterChange={setMapCenter}>
+        <RoutePlanner 
+          mobileTab={mobileTab} 
+          setMobileTab={setMobileTab} 
+        />
+        <FeedPage 
+          center={mapCenter} 
+          mobileTab={mobileTab} 
+          setMobileTab={setMobileTab} 
+        />
+      </MapView>
+    </MainLayout>
+  );
+}
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<ProtectedRoute><MapLayout /></ProtectedRoute>} />
-          <Route path="/share" element={<ProtectedRoute><SharePage /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
-          <Route path="/business/dashboard" element={<ProtectedRoute><BusinessDashboardPage /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-          <Route path="/test-data" element={<ProtectedRoute><TestDataPage /></ProtectedRoute>} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/" element={<ProtectedRoute><MapLayout /></ProtectedRoute>} />
+            <Route path="/business/:id" element={<ProtectedRoute><MainLayout><BusinessDetailPage /></MainLayout></ProtectedRoute>} />
+            <Route path="/share" element={<ProtectedRoute><MainLayout><SharePage /></MainLayout></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><MainLayout><UserProfilePage /></MainLayout></ProtectedRoute>} />
+            <Route path="/business/dashboard" element={<ProtectedRoute><MainLayout><BusinessDashboardPage /></MainLayout></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><MainLayout><SettingsPage /></MainLayout></ProtectedRoute>} />
+            <Route path="/test-data" element={<ProtectedRoute><MainLayout><TestDataPage /></MainLayout></ProtectedRoute>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

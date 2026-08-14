@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj": {}
+    "/media/cagri/iki1/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj": {}
   },
   "projects": {
-    "/media/cagri/iki/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj": {
+    "/media/cagri/iki1/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/media/cagri/iki/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj",
+        "projectUniqueName": "/media/cagri/iki1/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj",
         "projectName": "WaySpot.Core",
-        "projectPath": "/media/cagri/iki/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj",
+        "projectPath": "/media/cagri/iki1/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj",
         "packagesPath": "/home/cagri/.nuget/packages/",
-        "outputPath": "/media/cagri/iki/WaySpot/backend/WaySpot.Core/obj/",
+        "outputPath": "/media/cagri/iki1/WaySpot/backend/WaySpot.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/cagri/.nuget/NuGet/NuGet.Config"
@@ -68,14 +68,14 @@
         }
       }
     },
-    "/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj": {
+    "/media/cagri/iki1/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj",
+        "projectUniqueName": "/media/cagri/iki1/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj",
         "projectName": "WaySpot.Infrastructure",
-        "projectPath": "/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj",
+        "projectPath": "/media/cagri/iki1/WaySpot/backend/WaySpot.Infrastructure/WaySpot.Infrastructure.csproj",
         "packagesPath": "/home/cagri/.nuget/packages/",
-        "outputPath": "/media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/obj/",
+        "outputPath": "/media/cagri/iki1/WaySpot/backend/WaySpot.Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/cagri/.nuget/NuGet/NuGet.Config"
@@ -90,8 +90,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/media/cagri/iki/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj": {
-                "projectPath": "/media/cagri/iki/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj"
+              "/media/cagri/iki1/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj": {
+                "projectPath": "/media/cagri/iki1/WaySpot/backend/WaySpot.Core/WaySpot.Core.csproj"
               }
             }
           }

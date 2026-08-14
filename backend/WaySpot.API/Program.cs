@@ -28,35 +28,21 @@ builder.Services.AddDistributedMemoryCache();
 
 var securitySettings = builder.Configuration.GetSection("Security").Get<SecuritySettings>() ?? new SecuritySettings();
 
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "wayspot_super_secret_key_2024_must_be_at_least_32_chars!";
+var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        SecurityKey key;
-        if (securitySettings.LocalDevBypass)
-        {
-            key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!));
-        }
-        else
-        {
-            if (!File.Exists("jwt-key.pem"))
-            {
-                var newRsa = RSA.Create();
-                File.WriteAllText("jwt-key.pem", newRsa.ExportRSAPrivateKeyPem());
-            }
-            var rsaKey = RSA.Create();
-            rsaKey.ImportFromPem(File.ReadAllText("jwt-key.pem").ToCharArray());
-            key = new RsaSecurityKey(rsaKey);
-        }
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = key,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "WaySpotAPI",
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "WaySpotClient",
+            IssuerSigningKey = signingKey,
             ClockSkew = TimeSpan.Zero,
             RequireExpirationTime = true,
             RequireSignedTokens = true
@@ -143,6 +129,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<WaySpotDbContext>();
     db.Database.Migrate();
+    var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+    DbSeeder.SeedAsync(db, passwordService).GetAwaiter().GetResult();
 }
 
 if (app.Environment.IsDevelopment())

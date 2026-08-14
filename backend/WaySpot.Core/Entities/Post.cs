@@ -9,6 +9,9 @@ public class Post
     public double TargetRadiusKm { get; set; } = 20.0;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ExpiresAt { get; set; }
+    public bool IsActive { get; set; } = true;
 
+    public Guid UserId { get; set; }
+    public AppUser User { get; set; } = null!;
     public Business Business { get; set; } = null!;
 }

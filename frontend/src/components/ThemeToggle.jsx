@@ -1,26 +1,25 @@
 import { useTheme } from '../hooks/useTheme';
+import { Moon, Sun } from 'lucide-react';
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   return (
     <button
       onClick={toggleTheme}
-      style={{
-        position: 'absolute',
-        top: '20px',
-        right: '20px',
-        zIndex: 1000, // To render over the map
-        background: theme === 'light' ? 'var(--primary)' : 'var(--primary)',
-        color: 'var(--primary-text)',
-        padding: '10px 16px',
-        borderRadius: '16px',
-        border: 'none',
-        cursor: 'pointer',
-        fontWeight: 600,
-        boxShadow: 'var(--shadow-medium)'
-      }}
+      className="theme-toggle-btn"
+      title={theme === 'light' ? 'Karanlık Moda Geç' : 'Aydınlık Moda Geç'}
     >
-      {theme === 'light' ? '🌙 Karanlık Mod' : '☀️ Aydınlık Mod'}
+      {theme === 'light' ? (
+        <>
+          <Moon size={16} />
+          <span className="theme-toggle-text">Karanlık</span>
+        </>
+      ) : (
+        <>
+          <Sun size={16} />
+          <span className="theme-toggle-text">Aydınlık</span>
+        </>
+      )}
     </button>
   );
 }

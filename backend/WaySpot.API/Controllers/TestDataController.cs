@@ -13,10 +13,25 @@ namespace WaySpot.API.Controllers;
 public class TestDataController : ControllerBase
 {
     private readonly WaySpotDbContext _context;
+    private readonly WaySpot.Core.Interfaces.IPasswordService _passwordService;
 
-    public TestDataController(WaySpotDbContext context)
+    public TestDataController(WaySpotDbContext context, WaySpot.Core.Interfaces.IPasswordService passwordService)
     {
         _context = context;
+        _passwordService = passwordService;
+    }
+
+    [HttpPost("seed-cities")]
+    public async Task<IActionResult> SeedCities()
+    {
+        await DbSeeder.SeedAsync(_context, _passwordService);
+        var totalBusinesses = await _context.Businesses.CountAsync();
+        var totalPosts = await _context.Posts.CountAsync();
+        return Ok(new { 
+            message = "Antalya, Konya ve İzmir işletmeleri ve paylaşımları başarıyla eklendi.", 
+            totalBusinesses, 
+            totalPosts 
+        });
     }
 
     [HttpPost("seed-businesses")]

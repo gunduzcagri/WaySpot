@@ -8,4 +8,5 @@ public class PostResponse
     public double TargetRadiusKm { get; set; }
     public DateTime CreatedAt { get; set; }
     public BusinessResponse Business { get; set; } = null!;
+    public UserResponse? User { get; set; }
 }

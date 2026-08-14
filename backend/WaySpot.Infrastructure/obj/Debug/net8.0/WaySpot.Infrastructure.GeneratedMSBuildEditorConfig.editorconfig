@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WaySpot.Infrastructure
-build_property.ProjectDir = /media/cagri/iki/WaySpot/backend/WaySpot.Infrastructure/
+build_property.ProjectDir = /media/cagri/iki1/WaySpot/backend/WaySpot.Infrastructure/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
